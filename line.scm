@@ -17,26 +17,12 @@
 	(abnf:bind-consumed->string
 	 (abnf:concatenation
 		(abnf:repetition1 abnf:decimal)
-		(abnf:drop-consumed (abnf:char #\.))		)))
+		(abnf:drop-consumed (abnf:char #\.)))))
 
-(define move
-		(abnf:concatenation
-		 mnumber
-		 matom
-		 ws
-		 matom
-		 ws
-		 ))
-(define moves
-	(abnf:repetition1
-		move
-		))
-(define move-text
-	(abnf:repetition1
-	 (abnf:concatenation
-		moves
-		nl))
-	)
+(define move (abnf:concatenation mnumber matom ws matom ws))
+(define moves (abnf:repetition1	move))
+(define move-text 	(abnf:repetition1	moves))
+
 (define (->char-list s)
   (if (string? s) (string->list s) s))
 (define (err s)

@@ -12,11 +12,10 @@
 (define Atom
   (abnf:bind-consumed->string (abnf:repetition1 atext)))
 
-(define ws (abnf:repetition (abnf:set-from-string " \t\r\n")))
 ;(define ws (abnf:drop-consumed (abnf:repetition abnf:wsp)))
 
 (define lf (abnf:drop-consumed (abnf:repetition1 abnf:lf)))
-(define nl (abnf:drop-consumed (abnf:repetition1 (abnf:set-from-string "\r\n"))))
+(define ws (abnf:repetition (abnf:set-from-string " \t\r\n")))
 
 (define begin-tag (abnf:drop-consumed (abnf:char #\[ )))
 (define end-tag (abnf:drop-consumed (abnf:char #\] )))
@@ -53,6 +52,19 @@
 							 score-second
 							 score-draw
 							 ))
+(define mtext
+(abnf:alternatives
+ abnf:alpha abnf:decimal
+ (abnf:set-from-string "!+-/?")))
+ (define matom
+(abnf:bind-consumed->string (abnf:repetition1 mtext)))
+ 
+ (define mnumber
+  (abnf:bind-consumed->string
+   (abnf:concatenation
+	  (abnf:repetition1 abnf:decimal)
+	  (abnf:drop-consumed (abnf:char #\.)))))
+ 
 
 (define quoted-string
   (abnf:bind-consumed->string 
@@ -80,41 +92,23 @@
 	 lf
 	 ))
 
-(define mtext
-  (abnf:alternatives
-   abnf:alpha abnf:decimal
-   (abnf:set-from-string "!+-/?")))
-(define matom
-  (abnf:bind-consumed->string (abnf:repetition1 mtext)))
-
-(define mnumber
-	(abnf:bind-consumed->string
-	 (abnf:concatenation
-		(abnf:repetition1 abnf:decimal)
-		(abnf:drop-consumed (abnf:char #\.))		)))
-
-(define move
-		(abnf:concatenation	mnumber matom ws	matom ws))
-(define moves
-	(abnf:repetition1
-	 move
-	 ))
-
-(define move-block
-	(abnf:repetition1
-	 (abnf:concatenation
-		moves
-		nl))
+(define move (abnf:concatenation mnumber matom abnf:sp matom (abnf:optional-sequence abnf:sp)))
+(define moves (abnf:repetition1	move))
+(define move-text
+ (abnf:repetition1
+	(abnf:concatenation 
+	moves
+(abnf:optional-sequence abnf:lf)
 	)
+	
+)
 
+ )
 (define pgn
-	(abnf:concatenation
-	 roster
-	 move-block
-	 ))
+	(abnf:concatenation	 roster move-text))
+
 (define (->char-list s)
   (if (string? s) (string->list s) s))
-
 
 (define (err s)
   (print "PGN parser error on stream: " s)
@@ -126,7 +120,7 @@
     (pgn car err `(() ,(->char-list s)))))
 
 (define read-kasparov
-	(read-string #f (open-input-file "little.pgn")))
+	(read-string #f (open-input-file "big.pgn")))
 
 (parser read-kasparov)
 

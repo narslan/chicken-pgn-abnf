@@ -57,23 +57,35 @@
 ;; Move routines
 
 
+
+(define annotation-symbol 
+  (abnf:set-from-string "?!+#" ))
+(define annotation 
+  (abnf:concatenation
+   (abnf:repetition
+    annotation-symbol)))
+
 (define piece 
   (abnf:set-from-string "KNRBQknrbq" ))
 (define rank 
   (abnf:set-from-string "12345678" ))
 (define file
   (abnf:set-from-string "abcdefgh" ))
-(define xchar
-  (abnf:char "x" ))
-(define pluschar
-  (abnf:char "+" ))
+(define capturechar
+  (abnf:char #\x ))
+(define checkchar
+  (abnf:char #\+ ))
 (define sharpchar
-  (abnf:char "#" ))
+  (abnf:char #\# ))
 
 (define move-text
-  (
-
-   ))
+  (abnf:bind-consumed->string
+    (abnf:concatenation
+     (abnf:alternatives file  piece)
+     (abnf:alternatives file capturechar piece rank)
+     (abnf:repetition
+      (abnf:alternatives file  piece rank annotation-symbol)))
+    )   ) 
 
 
 (define pgn

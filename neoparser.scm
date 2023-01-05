@@ -52,9 +52,7 @@
    (abnf:drop-consumed abnf:wsp)
    tag-value
    end-tag
-   (abnf:drop-consumed
-    (abnf:repetition1
-     (abnf:set-from-string "\r\n")))))
+   ))
 
 
 

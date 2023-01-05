@@ -23,7 +23,14 @@
 	     (char-set (integer->char 0)
 		       (integer->char 10)
 		       (integer->char 13)
+		       (integer->char 22)
 	      ))))
+;; Parses and returns any ASCII characters except [ ] and \
+
+(define dtext
+  (abnf:set 
+   (char-set-difference char-set:printing (char-set #\[ #\] #\\ #\"))))
+
 (define tag-key
   (abnf:bind-consumed->string
    (abnf:repetition abnf:alpha)
@@ -33,7 +40,7 @@
   (abnf:bind-consumed->string
    (abnf:concatenation
     (abnf:drop-consumed abnf:dquote)
-    text
+    (abnf:repetition     dtext )
     (abnf:drop-consumed abnf:dquote)
     )
    ))
@@ -42,7 +49,7 @@
   (abnf:concatenation
    begin-tag
    tag-key
-   abnf:wsp
+   (abnf:drop-consumed abnf:wsp)
    tag-value
    end-tag
    (abnf:drop-consumed

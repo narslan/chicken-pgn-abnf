@@ -14,7 +14,8 @@
 	`(
 	  ("["  ("") ())
 	  ("[Event]"  ("Event") ())
-	  ("[Event] \"Havana m\" "  () ())
+	  ("[Event \"Havana\"]"  ("Havana", "Event") ())
+	  ("[Event \"Havana m.\"]"  ("Havana m.", "Event") ())
 	  ))
        )
   (test-group "tags"

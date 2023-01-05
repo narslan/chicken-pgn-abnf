@@ -5,7 +5,7 @@
 	(only lexgen lex)
 	test
 	fmt
-	srfi-1
+	
 	(only utf8-srfi-14 char-set char-set-difference char-set-union
 	      char-set:graphic char-set:printing char-set:ascii char-set:full
 	      )
@@ -37,15 +37,25 @@
      (abnf:set-from-string "\r\n")))
    ))
 
+
+
 (define pgn
   (abnf:repetition tag))
  
-(define (err s)
-  (print "lexical error on stream: " s)
-  `(error))
-(define read-pgn
-	(read-string #f (open-input-file "big.pgn")))
-(define parse-begin-tag (lex begin-tag err "["))
-(define parse (lex pgn err read-pgn))
+
+
+;;(define read-pgn
+;;  (read-string #f (open-input-file "big.pgn"))
+;;
+;;)
+
+;;
+;;
+
+
+;(define parse-begin-tag (lex begin-tag err "["))
+
+					;(define parse (lex pgn err read-pgn))
+
 
 

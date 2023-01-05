@@ -1,16 +1,29 @@
 (import 
   test
-  fmt
-  srfi-1 )
+  srfi-1
+  (chicken format)
+)
 (include "neoparser.scm")
-(define (->char-list s)
-  (if (string? s) (string->list s) s ))
-(test-begin "lexer")
-(test-group "tag tests"
-  (test "begin tag"
-	,@(->char-list "heheh")
-	parse-begin-tag
-	)
-    )
 
-(test-end)
+(define (string->input-stream s) `(() ,(string->list s)))
+(define (err s)
+  (print "internet message error on stream: " s)
+  `(error))
+
+(let* ((tag-cases
+	`(
+	  ("["  () ())
+	  ))
+       )
+  (test-group "comments"
+    (for-each (lambda (p)
+		(let ((inp (first p))
+		      (res (second p)))
+		  (let ((is (string->input-stream inp)))
+		    (pgn (lambda (s) (test (apply sprintf "~S -> ~S" p) res (car s))) err is))))
+	      tag-cases))
+  )
+
+(test-exit)
+
+  

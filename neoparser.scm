@@ -12,9 +12,6 @@
 	)
 (define char-set:quoted (char-set-difference char-set:printing (char-set #\\ #\")))
 
-
-
-
 (define begin-tag (abnf:drop-consumed (abnf:char #\[ )))
 (define end-tag (abnf:drop-consumed (abnf:char #\] )))
 (define text
@@ -25,11 +22,11 @@
 		       (integer->char 13)
 		       (integer->char 22)
 	      ))))
-;; Parses and returns any ASCII characters except [ ] and \
+;; Parses and returns any ASCII characters except "
 
 (define dtext
   (abnf:set 
-   (char-set-difference char-set:printing (char-set #\[ #\] #\\ #\"))))
+   (char-set-difference char-set:printing (char-set #\"))))
 
 (define tag-key
   (abnf:bind-consumed->string
@@ -57,14 +54,33 @@
      (abnf:set-from-string "\r\n")))))
 
 
+;; Move routines
+
+
+(define piece 
+  (abnf:set-from-string "KNRBQknrbq" ))
+(define rank 
+  (abnf:set-from-string "12345678" ))
+(define file
+  (abnf:set-from-string "abcdefgh" ))
+(define xchar
+  (abnf:char "x" ))
+(define pluschar
+  (abnf:char "+" ))
+(define sharpchar
+  (abnf:char "#" ))
+
+(define move-text
+  (
+
+   ))
+
 
 (define pgn
   (abnf:concatenation
    (abnf:repetition
     tag
-    )
-
-   ))
+    )))
  
 
 

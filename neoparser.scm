@@ -78,7 +78,7 @@
 (define sharpchar
   (abnf:char #\# ))
 (define dotchar
-  (abnf:char #\.))
+  (abnf:drop-consumed (abnf:char #\.)))
 (define castling
   (abnf:concatenation
    (abnf:lit "O-O")
@@ -95,14 +95,30 @@
       (abnf:repetition
        (abnf:alternatives file piece rank annotation-symbol)))
      ))) 
+(define lwsp
+  (abnf:drop-consumed abnf:lwsp))
 
+(define move-decimal
+  (abnf:concatenation
+   (abnf:bind-consumed->string
+    (abnf:repetition abnf:decimal))
+   dotchar
+   lwsp
+      )   )
 
 (define move
   (abnf:concatenation
-   (abnf:repetition abnf:decimal) 
-    dotchar
-    (abnf:optional-sequence abnf:wsp)
-    move-text ))
+   move-decimal
+   move-text
+   lwsp 
+   move-text
+   ))
+(define all-moves
+  (abnf:repetition
+   move
+   )
+  )
+
 
 (define pgn
   (abnf:concatenation

@@ -7,7 +7,7 @@
 
 (define (string->input-stream s) `(() ,(string->list s)))
 (define (err s)
-  (print "internet message error on stream: " s)
+  (print "pgn message error on stream: " s)
   (list))
 
 (let* ((tag-cases
@@ -32,17 +32,23 @@
 	  ("axb6#" ("axb6#") ())
 	  ("O-O" ("O-O") ())
 	  ("O-O-O" ("O-O-O") ())
-
-
+	  ))
 	  
-       (move-cases
+       (single-move-cases
 	`(
-	  ("1.e4"    ("1" "e4")    ())
-	  ("1. Nf3"   ("1" "Nf3")   ())
-	  
+	  ("1.e4 e5"    ("e5" "e4" "1")    ())
+	  ("29. Ng6 Nf3 "   ("Nf3" "Ng6" "29")   ())
+	  ("45. Nf3 Bc3"   ("Bc3" "Nf3" "45")   ())
+	  ))
 
-
-	  )))
+       (multiple-move-cases
+	`(
+	  ("1. e4 e5 2. Nf3 Nf6 "    ("e5" "e4" "1")    ())
+	 
+	  ))
+       
+       
+       )
 
 
   (test-group "tags"
@@ -69,23 +75,26 @@
 		    (move-text (lambda (s) (test (apply sprintf "~S -> ~S" p) res (car s))) err is))))
 	      move-text-cases))
 
-(test-group "move-cases"
+(test-group "single-move-cases"
     (for-each (lambda (p)
 		(let ((inp (first p))
 		      (res (second p)))
 		  (let ((is (string->input-stream inp)))
 		    (move (lambda (s) (test (apply sprintf "~S -> ~S" p) res (car s))) err is))))
-	      move-cases))
-   )
+	      single-move-cases))
 
-)
 
+(test-group "multiple-move-cases"
+    (for-each (lambda (p)
+		(let ((inp (first p))
+		      (res (second p)))
+		  (let ((is (string->input-stream inp)))
+		    (all-moves (lambda (s) (test (apply sprintf "~S -> ~S" p) res (car s))) err is))))
+	      multiple-move-cases))
+
+)       
        
 
-
-
-
-
-       (test-exit)
+  (test-exit)
 
   

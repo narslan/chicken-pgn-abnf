@@ -32,7 +32,16 @@
 	  ("axb6#" ("axb6#") ())
 	  ("O-O" ("O-O") ())
 	  ("O-O-O" ("O-O-O") ())
-	   
+
+
+	  
+       (move-cases
+	`(
+	  ("1.e4"    ("1" "e4")    ())
+	  ("1. Nf3"   ("1" "Nf3")   ())
+	  
+
+
 	  )))
 
 
@@ -59,13 +68,24 @@
 		  (let ((is (string->input-stream inp)))
 		    (move-text (lambda (s) (test (apply sprintf "~S -> ~S" p) res (car s))) err is))))
 	      move-text-cases))
+
+(test-group "move-cases"
+    (for-each (lambda (p)
+		(let ((inp (first p))
+		      (res (second p)))
+		  (let ((is (string->input-stream inp)))
+		    (move (lambda (s) (test (apply sprintf "~S -> ~S" p) res (car s))) err is))))
+	      move-cases))
    )
 
+)
+
+       
 
 
 
 
 
-(test-exit)
+       (test-exit)
 
   

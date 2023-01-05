@@ -77,32 +77,37 @@
   (abnf:char #\+ ))
 (define sharpchar
   (abnf:char #\# ))
+(define dotchar
+  (abnf:char #\.))
 (define castling
   (abnf:concatenation
    (abnf:lit "O-O")
    (abnf:repetition
-    (abnf:lit "-O")
-    )))
+    (abnf:lit "-O"))))
 
 (define move-text
   (abnf:bind-consumed->string
    (abnf:alternatives
     castling
      (abnf:concatenation
-      (abnf:alternatives file  piece)
+      (abnf:alternatives file piece)
       (abnf:alternatives file capturechar piece rank)
       (abnf:repetition
        (abnf:alternatives file piece rank annotation-symbol)))
-     )
+     ))) 
 
-   )) 
 
+(define move
+  (abnf:concatenation
+   (abnf:repetition abnf:decimal) 
+    dotchar
+    (abnf:optional-sequence abnf:wsp)
+    move-text ))
 
 (define pgn
   (abnf:concatenation
    (abnf:repetition
-    tag
-    )))
+    tag)))
  
 
 

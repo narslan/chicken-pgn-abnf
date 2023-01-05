@@ -16,6 +16,9 @@
 	  ("[Event]"  ("Event") ())
 	  ("[Event \"Havana\"]"  ("Havana", "Event") ())
 	  ("[Event \"Havana m.\"]"  ("Havana m.", "Event") ())
+	  ("[Event \"Havana m.\"]\n"  ("Havana m.", "Event") ())
+	  ("[Event \"Havana m.\"]\r\n"  ("Havana m.", "Event") ())
+	  ("[Event \"Havana m.\"]\r\n[EventTest \"Havana2\"]"  ("Havana2", "EventTest", "Havana m.", "Event") ())
 	  ))
        )
   (test-group "tags"

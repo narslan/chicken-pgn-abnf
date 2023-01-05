@@ -8,14 +8,16 @@
 (define (string->input-stream s) `(() ,(string->list s)))
 (define (err s)
   (print "internet message error on stream: " s)
-  `(error))
+  (list))
 
 (let* ((tag-cases
 	`(
-	  ("["  () ())
+	  ("["  ("") ())
+	  ("[Event]"  ("Event") ())
+	  ("[Event] \"Havana m\" "  () ())
 	  ))
        )
-  (test-group "comments"
+  (test-group "tags"
     (for-each (lambda (p)
 		(let ((inp (first p))
 		      (res (second p)))

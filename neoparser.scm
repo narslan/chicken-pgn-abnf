@@ -10,11 +10,8 @@
 	      char-set:graphic char-set:printing char-set:ascii char-set:full
 	      )
 	)
+(define char-set:quoted (char-set-difference char-set:printing (char-set #\\ #\")))
 
-(define tagText
-  (abnf:alternatives
-   abnf:alpha abnf:decimal
-   (abnf:set-from-string ",.!#$%&'*+-/=?^_`{|}~")))
 
 
 
@@ -27,15 +24,30 @@
 		       (integer->char 10)
 		       (integer->char 13)
 	      ))))
+(define tag-key
+  (abnf:bind-consumed->string
+   (abnf:repetition abnf:alpha)
+   ))
+
+(define tag-value
+  (abnf:bind-consumed->string
+   (abnf:concatenation
+    (abnf:drop-consumed abnf:dquote)
+    text
+    (abnf:drop-consumed abnf:dquote)
+    )
+   ))
+
 (define tag
   (abnf:concatenation
    begin-tag
-   tagText
+   tag-key
+   abnf:wsp
+   tag-value
    end-tag
    (abnf:drop-consumed
     (abnf:repetition1
-     (abnf:set-from-string "\r\n")))
-   ))
+     (abnf:set-from-string "\r\n")))))
 
 
 

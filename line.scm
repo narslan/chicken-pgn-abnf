@@ -1,6 +1,6 @@
 (import (chicken io)
-				(prefix abnf abnf:) 
-				(prefix abnf-consumers abnf:))
+        (prefix abnf abnf:) 
+        (prefix abnf-consumers abnf:))
 
 (define nl (abnf:repetition (abnf:set-from-string "\r\n")))
 (define ws (abnf:repetition (abnf:set-from-string " \t\r\n")))
@@ -14,14 +14,14 @@
   (abnf:bind-consumed->string (abnf:repetition1 mtext)))
 
 (define mnumber
-	(abnf:bind-consumed->string
-	 (abnf:concatenation
-		(abnf:repetition1 abnf:decimal)
-		(abnf:drop-consumed (abnf:char #\.)))))
+  (abnf:bind-consumed->string
+   (abnf:concatenation
+    (abnf:repetition1 abnf:decimal)
+    (abnf:drop-consumed (abnf:char #\.)))))
 
 (define move (abnf:concatenation mnumber matom ws matom ws))
-(define moves (abnf:repetition1	move))
-(define move-text 	(abnf:repetition1	moves))
+(define moves (abnf:repetition1  move))
+(define move-text   (abnf:repetition1  moves))
 
 (define (->char-list s)
   (if (string? s) (string->list s) s))
@@ -33,7 +33,7 @@
     (move-text car err `(() ,(->char-list s)))))
 
 (define read-kasparov
-	(read-string #f (open-input-file "big.pgn")))
+  (read-string #f (open-input-file "big.pgn")))
 
 ;;(parser (read-kasparov))
 (print (parser read-kasparov))

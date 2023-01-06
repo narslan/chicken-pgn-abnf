@@ -39,8 +39,8 @@
     (abnf:drop-consumed abnf:dquote)
     (abnf:repetition     dtext )
     (abnf:drop-consumed abnf:dquote)
-    )
-   ))
+    )))
+
 
 (define tag
   (abnf:concatenation
@@ -85,39 +85,46 @@
    (abnf:repetition
     (abnf:lit "-O"))))
 
+(define lwsp
+  (abnf:drop-consumed abnf:lwsp))
+
+
+
 (define move-text
   (abnf:bind-consumed->string
-   (abnf:alternatives
+  
+(abnf:alternatives
     castling
      (abnf:concatenation
       (abnf:alternatives file piece)
       (abnf:alternatives file capturechar piece rank)
       (abnf:repetition
        (abnf:alternatives file piece rank annotation-symbol)))
-     ))) 
-(define lwsp
-  (abnf:drop-consumed abnf:lwsp))
-
+     )
+   )) 
+;move-number is the first ("3. ") number before the dot in the move..
 (define move-decimal
   (abnf:concatenation
    (abnf:bind-consumed->string
     (abnf:repetition abnf:decimal))
    dotchar
-   lwsp
-      )   )
+   lwsp))
 
+;move is a single move (3. Qe3!)
 (define move
   (abnf:concatenation
    move-decimal
    move-text
    lwsp 
    move-text
-   ))
+   lwsp ))
+
+
 (define all-moves
-  (abnf:repetition
-   move
-   )
-  )
+  
+(abnf:repetition
+    move
+    ))
 
 
 (define pgn

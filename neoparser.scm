@@ -10,6 +10,13 @@
 	      char-set:graphic char-set:printing char-set:ascii char-set:full
 	      )
 	)
+
+(define :? abnf:optional-sequence)
+(define :! abnf:drop-consumed)
+(define :* abnf:repetition)
+(define :+ abnf:repetition1)
+
+
 (define char-set:quoted (char-set-difference char-set:printing (char-set #\\ #\")))
 
 (define begin-tag (abnf:drop-consumed (abnf:char #\[ )))
@@ -88,21 +95,35 @@
 (define lwsp
   (abnf:drop-consumed abnf:lwsp))
 
+(define fws
+  (abnf:concatenation
+   (:?
+    (abnf:concatenation
+     (:* abnf:wsp)
+     (:! 
+      (abnf:alternatives abnf:crlf abnf:lf abnf:cr))))
+   (:+ abnf:wsp)))
 
 
-(define move-text
-  (abnf:bind-consumed->string
-  
-(abnf:alternatives
-    castling
+(define (between-fws p)
+  (abnf:concatenation
+   (:! (:* fws)) p 
+   (:! (:* fws))))
+
+(define movetext-between-spaces
+   (abnf:bind-consumed->string
+    (abnf:alternatives
+     castling
      (abnf:concatenation
       (abnf:alternatives file piece)
       (abnf:alternatives file capturechar piece rank)
-      (abnf:repetition
+      (:*
        (abnf:alternatives file piece rank annotation-symbol)))
-     )
-   )) 
-;move-number is the first ("3. ") number before the dot in the move..
+     )))
+
+(define move-text (between-fws movetext-between-spaces ))
+
+					;move-number is the first ("3. ") number before the dot in the move..
 (define move-decimal
   (abnf:concatenation
    (abnf:bind-consumed->string
@@ -115,9 +136,8 @@
   (abnf:concatenation
    move-decimal
    move-text
-   lwsp 
    move-text
-   lwsp ))
+))
 
 
 (define all-moves

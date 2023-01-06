@@ -43,7 +43,10 @@
 
        (multiple-move-cases
         `(
-          ("1. e4 e5 2. Nf3 Nf6 "    ("", "Nf6", "Nf3", "e5" "e4" "1")    ()))))
+          ("1. c4 Nf3 2. Bf3 Nf6 "    ("Nf6" "Bf3" "2" "Nf3" "c4" "1")    ())
+	  ("1. d4 e5 2. Nf3 Nf6"    ("Nf6" "Nf3" "2" "e5" "d4" "1")    ())
+	  ("1.e4 e5 2. Nf3 Nf6"    ("Nf6" "Nf3" "2" "e5" "e4" "1")    ())
+	  )))
 
 
   (test-group "tags"

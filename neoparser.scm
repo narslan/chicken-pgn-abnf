@@ -110,7 +110,7 @@
    ))
 
 (define result-text
- (abnf:bind-consumed->string
+ (:!
   (abnf:concatenation
    (:+
    (abnf:alternatives
@@ -120,11 +120,18 @@
     (abnf:char #\* )
     (abnf:char #\/ )
     (abnf:char #\- )
+    )))))
+
+(define result-name 
+  (:!
+   (abnf:alternatives
+    (abnf:lit "1-0")
+    (abnf:lit "0-1")
+    (abnf:lit "1/2-1/2")
+    (abnf:lit "*")
     )))
 
-   ))
-
-(define result (between-fws result-text ))
+(define result (between-fws result-name ))
 	
 (define movetext-between-spaces
    (abnf:bind-consumed->string
@@ -169,6 +176,11 @@
 
 (define comment-text (between-fws comment ))
 				;move is a single move (3. Qe3!)
+
+
+
+(define all-tags (:* tag))
+
 (define move
   (abnf:concatenation
    move-decimal
@@ -176,14 +188,11 @@
    (:? comment-text)
    (:? move-text)
    (:? comment-text)
-   
+   (:? result)   
    ))
-
-
-(define all-tags (:* tag))
 (define all-moves (abnf:concatenation
 		   (:+ move)
-		   (:? result-text)
+   
 		   ))
 
 (define game-body
@@ -209,6 +218,5 @@
 					;(define parse-begin-tag (lex begin-tag err "["))
 
 					;(define parse (lex pgn err read-pgn))
-
 
 

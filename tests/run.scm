@@ -110,14 +110,20 @@
  
 (define (->char-list s)
   (if (string? s) (string->list s) s))
+
 (define parser
   (lambda (s)
     (let* ([parsed-pgn (pgn car err `(() ,(->char-list s)))])
-	      (for-each print parsed-pgn)
-
-	      )
-    
-    ))
+      (for-each
+       (lambda (t)
+	 (let* ([token-key (first t)]
+	       [token-value (second t)])
+	   (printf "~S ~S" token-key token-value)
+	   )
+	 (newline)
+	 )
+	      parsed-pgn  ) 
+	      ) ) )
 
 (define read-pgn
   (read-string #f (open-input-file "1.pgn")))

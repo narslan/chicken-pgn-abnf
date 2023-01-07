@@ -7,18 +7,12 @@
 	fmt
 	
 	(only utf8-srfi-14 char-set char-set-difference char-set-union
-	      char-set:graphic char-set:printing char-set:ascii char-set:full
-	      )
-	)
+	      char-set:graphic char-set:printing char-set:ascii char-set:full))
 
 (define :? abnf:optional-sequence)
 (define :! abnf:drop-consumed)
 (define :* abnf:repetition)
 (define :+ abnf:repetition1)
-
-(define consumed-objects-lift-any
-  (abnf:consumed-objects-lift
-   (abnf:consumed-objects identity)))
 
 (define fws
   (abnf:concatenation

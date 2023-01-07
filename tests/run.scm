@@ -112,12 +112,17 @@
   (if (string? s) (string->list s) s))
 (define parser
   (lambda (s)
-    (pgn car err `(() ,(->char-list s)))))
+    (let* ([parsed-pgn (pgn car err `(() ,(->char-list s)))])
+	      (for-each print parsed-pgn)
+
+	      )
+    
+    ))
 
 (define read-pgn
   (read-string #f (open-input-file "1.pgn")))
   
-(print (parser read-pgn))
+ (parser read-pgn)
 
           ;end of let-rec*
        

@@ -172,13 +172,17 @@
 ;;move is a single move (3. Qe3!)
 
 (define move
-  (abnf:concatenation
-   move-number
-   move-text
-   (:? comment-text)
-   (:? move-text)
-   (:? comment-text)
-   (:? result)))
+(abnf:bind-consumed-strings->list
+ 'move
+ (abnf:concatenation
+  move-number
+  move-text
+  (:? comment-text)
+  (:? move-text)
+  (:? comment-text)
+  (:? result))
+ )
+  )
 
 
 (define all-tags (:* tag))

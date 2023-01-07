@@ -12,7 +12,7 @@
 
 (let* ((tag-cases
         `(
-          ("[Event \"Havana m.\"]"  ("Havana m." "Event") ())
+          ("[Event \"Havana    m.   \"]"  ("Havana m." "Event") ())
           ("[Event \"Havana m.\"]\n"  ("Havana m." "Event") ())
           ("[Event \"Havana m.\"]\r\n"  ("Havana m." "Event") ()))) ; ; (out) 
     
@@ -46,16 +46,10 @@
           ("1. c4 Nf3 2. Bf3 Nf6 "    ("Nf6" "Bf3" "2" "Nf3" "c4" "1")    ())
 	  ("1. d4 e5 2. Nf3 Nf6"    ("Nf6" "Nf3" "2" "e5" "d4" "1")    ())
 	  ("1.e4 e5 2. Nf3 Nf6"    ("Nf6" "Nf3" "2" "e5" "e4" "1")    ())
+	  ("1.e4 e5 2. Nf3 Nf6+?    \n 3.Bc3"    ("Bc3" "3" "Nf6+?" "Nf3" "2" "e5" "e4" "1")    ())
 	  )))
 
 
-  (test-group "tags"
-    (for-each (lambda (p)
-               (let ((inp (first p))
-                     (res (second p)))
-                (let ((is (string->input-stream inp)))
-                 (tag (lambda (s) (test (apply sprintf "~S -> ~S" p) res (car s))) err is))))
-        tag-cases))
 
   (test-group "multiline-tags"
    (for-each (lambda (p)
@@ -88,7 +82,18 @@
                       (res (second p)))
                  (let ((is (string->input-stream inp)))
                   (all-moves (lambda (s) (test (apply sprintf "~S -> ~S" p) res (car s))) err is))))
-         multiple-move-cases)))
+         multiple-move-cases))
+
+ 
+  (test-group "tags"
+    (for-each (lambda (p)
+               (let ((inp (first p))
+                     (res (second p)))
+                (let ((is (string->input-stream inp)))
+                 (tag (lambda (s) (test (apply sprintf "~S -> ~S" p) res (car s))) err is))))
+        tag-cases))
+
+ )
  
 ;end of let-rec*
        

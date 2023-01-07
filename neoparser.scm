@@ -123,7 +123,7 @@
     )))))
 
 (define result-name 
-  (:!
+  (abnf:bind-consumed->string
    (abnf:alternatives
     (abnf:lit "1-0")
     (abnf:lit "0-1")

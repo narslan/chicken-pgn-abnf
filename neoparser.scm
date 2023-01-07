@@ -174,7 +174,7 @@
    move-decimal
    move-text
    (:? comment-text)
-   move-text
+   (:? move-text)
    (:? comment-text)
    
    ))
@@ -183,7 +183,7 @@
 (define all-tags (:* tag))
 (define all-moves (abnf:concatenation
 		   (:+ move)
-		   (:+ result-text)
+		   (:? result-text)
 		   ))
 
 (define game-body

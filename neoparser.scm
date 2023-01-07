@@ -42,7 +42,7 @@
 
 (define atext
   (abnf:alternatives
-   abnf:alpha abnf:decimal (abnf:set-from-string ":,!#$%&'*+-/=?^_`{|}~.")))
+   abnf:alpha abnf:decimal (abnf:set-from-string "():,!#$%&'*+-/=?^_`{|}~.")))
 
 
 ;; Quoted characters

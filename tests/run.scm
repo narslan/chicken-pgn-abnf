@@ -115,7 +115,7 @@
     (pgn car err `(() ,(->char-list s)))))
 
 (define read-pgn
-  (read-string #f (open-input-file "1.pgn")))
+  (read-string #f (open-input-file "Andersson.pgn")))
   
 (print (parser read-pgn))
 

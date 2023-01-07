@@ -16,6 +16,21 @@
 (define :* abnf:repetition)
 (define :+ abnf:repetition1)
 
+(define fws
+  (abnf:concatenation
+   (:?
+    (abnf:concatenation
+     (:* abnf:wsp)
+     (:! 
+      (abnf:alternatives abnf:crlf abnf:lf abnf:cr))))
+   (:+ abnf:wsp)))
+
+
+(define (between-fws p)
+  (abnf:concatenation
+   (:! (:* fws)) p 
+   (:! (:* fws))))
+
 ;a PGN tag is enclosed with []
 (define begin-tag (abnf:drop-consumed (abnf:char #\[ )))
 (define end-tag (abnf:drop-consumed (abnf:char #\] )))
@@ -24,24 +39,27 @@
   (abnf:bind-consumed->string
    (:* abnf:alpha)))
 
-; Parses every char and returns any ASCII characters except "
-(define unquoted-tag-text
+
+(define atext
+  (abnf:alternatives
+   abnf:alpha abnf:decimal (abnf:set-from-string "!#$%&'*+-/=?^_`{|}~.")))
+
+
+;; Quoted characters
+(define quoted-pair
   (abnf:concatenation
    (:*
-    (abnf:alternatives
-     abnf:alpha
-     abnf:ascii-char
-     abnf:wsp
-     ))))
-; a tag value is  
+    (abnf:alternatives atext abnf:wsp)
+    )
+   ))
+					; a tag value is  
 (define tag-value
+  (abnf:bind-consumed->string
    (abnf:concatenation
     (:! abnf:dquote)
-    (abnf:bind-consumed->string
-     unquoted-tag-text
-     )
+    quoted-pair
     (:! abnf:dquote)
-    ))
+    )))
 
 
 (define tag
@@ -88,20 +106,7 @@
 (define lwsp
   (abnf:drop-consumed abnf:lwsp))
 
-(define fws
-  (abnf:concatenation
-   (:?
-    (abnf:concatenation
-     (:* abnf:wsp)
-     (:! 
-      (abnf:alternatives abnf:crlf abnf:lf abnf:cr))))
-   (:+ abnf:wsp)))
 
-
-(define (between-fws p)
-  (abnf:concatenation
-   (:! (:* fws)) p 
-   (:! (:* fws))))
 
 (define movetext-between-spaces
    (abnf:bind-consumed->string

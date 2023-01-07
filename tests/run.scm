@@ -12,7 +12,7 @@
 
 (let* ((tag-cases
         `(
-          ("[Event \"Havana    m.   \"]"  ("Havana m." "Event") ())
+          ("[Event \"Havana    m.   \"]"  ("Havana    m.   " "Event") ())
           ("[Event \"Havana m.\"]\n"  ("Havana m." "Event") ())
           ("[Event \"Havana m.\"]\r\n"  ("Havana m." "Event") ()))) ; ; (out) 
     

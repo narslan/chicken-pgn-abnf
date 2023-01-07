@@ -42,7 +42,7 @@
 
 (define atext
   (abnf:alternatives
-   abnf:alpha abnf:decimal (abnf:set-from-string ",!#$%&'*+-/=?^_`{|}~.")))
+   abnf:alpha abnf:decimal (abnf:set-from-string ":,!#$%&'*+-/=?^_`{|}~.")))
 
 
 ;; Quoted characters
@@ -77,7 +77,7 @@
 ;; Move definitons.
 
 (define annotation-symbol 
-  (abnf:set-from-string "?!+#" ))
+  (abnf:set-from-string "=?!+#" ))
 (define annotation 
   (abnf:concatenation
    (abnf:repetition
@@ -127,12 +127,28 @@
    dotchar
    lwsp))
 
+;; Unicode variant of ctext
+(define unicode-ctext
+  (abnf:set
+   (char-set-union
+    (char-set-difference char-set:graphic (char-set #\{ #\} #\\))
+    (char-set-difference char-set:full  char-set:ascii))))
+
 (define comment
-  (abnf:concatenation
-   (abnf:bind-consumed->string
-    (abnf:repetition abnf:decimal))
-   dotchar
-   lwsp))
+  (abnf:bind-consumed->string
+   (abnf:concatenation 
+    (:! (abnf:char #\{) )
+    (:*
+     (abnf:concatenation
+      (:? fws)
+      unicode-ctext))
+    (:? fws)
+    (:! (abnf:char #\}))
+    )))
+
+(define comment-text (between-fws comment ))
+
+
 
 (define result
  (abnf:bind-consumed->string
@@ -149,7 +165,9 @@
   (abnf:concatenation
    move-decimal
    move-text
+   (:? comment-text)
    move-text
+   (:? comment-text)
    ))
 
 

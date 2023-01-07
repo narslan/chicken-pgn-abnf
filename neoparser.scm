@@ -42,7 +42,7 @@
 
 (define atext
   (abnf:alternatives
-   abnf:alpha abnf:decimal (abnf:set-from-string "!#$%&'*+-/=?^_`{|}~.")))
+   abnf:alpha abnf:decimal (abnf:set-from-string ",!#$%&'*+-/=?^_`{|}~.")))
 
 
 ;; Quoted characters
@@ -106,8 +106,6 @@
 (define lwsp
   (abnf:drop-consumed abnf:lwsp))
 
-
-
 (define movetext-between-spaces
    (abnf:bind-consumed->string
     (abnf:alternatives
@@ -136,6 +134,16 @@
    dotchar
    lwsp))
 
+(define result
+ (abnf:bind-consumed->string
+  (abnf:alternatives
+   (abnf:lit "1-0")
+   (abnf:lit "0-1")
+   (abnf:lit "1/2-1/2")
+   (abnf:lit "*")
+   )))
+
+(define result-text (between-fws result ))
 					;move is a single move (3. Qe3!)
 (define move
   (abnf:concatenation
@@ -145,8 +153,16 @@
    ))
 
 
+
+
 (define all-moves
-  (:* move))
+(abnf:concatenation
+ (:* move)
+ result-text
+ )
+  
+  
+  )
 
 ;
 (define multi-tags
@@ -157,8 +173,8 @@
 (define pgn
   (abnf:concatenation
    multi-tags
-   abnf:crlf
-   multi-tags
+   lwsp
+   all-moves
    ))
  
 

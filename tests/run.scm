@@ -47,7 +47,17 @@
 	  ("1. d4 e5 2. Nf3 Nf6"    ("Nf6" "Nf3" "2" "e5" "d4" "1")    ())
 	  ("1.e4 e5 2. Nf3 Nf6"    ("Nf6" "Nf3" "2" "e5" "e4" "1")    ())
 	  ("1.e4 e5 2. Nf3 Nf6+?    \n 3.Bc3"    ("Bc3" "3" "Nf6+?" "Nf3" "2" "e5" "e4" "1")    ())
-	  )))
+	  ))
+
+       (game-cases
+        `(
+          ("[Event \"Istanbul\"]\n 1. c4 Nf3 2. Bf3 Nf6 "    ("Nf6" "Bf3" "2" "Nf3" "c4" "1")    ())
+	  
+	  ))
+       
+       
+
+       )
 
 
 
@@ -56,7 +66,7 @@
               (let ((inp (first p))
                     (res (second p)))
                (let ((is (string->input-stream inp)))
-                (pgn (lambda (s) (test (apply sprintf "~S -> ~S" p) res (car s))) err is))))
+                (multi-tags (lambda (s) (test (apply sprintf "~S -> ~S" p) res (car s))) err is))))
        tag-multiline-cases)) ; ; (out) 
 ;tests if move text (Nf3) parse.
  (test-group "move-text-cases"
@@ -93,6 +103,15 @@
                  (tag (lambda (s) (test (apply sprintf "~S -> ~S" p) res (car s))) err is))))
         tag-cases))
 
+  
+  (test-group "game"
+    (for-each (lambda (p)
+               (let ((inp (first p))
+                     (res (second p)))
+                (let ((is (string->input-stream inp)))
+                 (pgn (lambda (s) (test (apply sprintf "~S -> ~S" p) res (car s))) err is))))
+        game-cases))
+  
  )
  
 ;end of let-rec*

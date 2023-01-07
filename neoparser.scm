@@ -148,10 +148,18 @@
 (define all-moves
   (:* move))
 
+;
+(define multi-tags
+  (abnf:concatenation
+   (:* tag)))
+
 
 (define pgn
   (abnf:concatenation
-   (:* tag)))
+   multi-tags
+   abnf:crlf
+   multi-tags
+   ))
  
 
 

@@ -109,20 +109,7 @@
     (abnf:lit "+"))
    ))
 
-(define result-text
- (:!
-  (abnf:concatenation
-   (:+
-   (abnf:alternatives
-    (abnf:char #\1 )
-    (abnf:char #\2 )
-    (abnf:char #\0 )
-    (abnf:char #\* )
-    (abnf:char #\/ )
-    (abnf:char #\- )
-    )))))
-
-(define result-name 
+(define result-variations 
   (abnf:bind-consumed->string
    (abnf:alternatives
     (abnf:lit "1-0")
@@ -131,7 +118,7 @@
     (abnf:lit "*")
     )))
 
-(define result (between-fws result-name ))
+(define result (between-fws result-variations ))
 	
 (define movetext-between-spaces
    (abnf:bind-consumed->string

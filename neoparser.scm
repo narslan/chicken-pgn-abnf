@@ -21,7 +21,7 @@
    (:?
     (abnf:concatenation
      (:* abnf:wsp)
-     (:! 
+     (:* 
       (abnf:alternatives abnf:crlf abnf:lf abnf:cr))))
    (:+ abnf:wsp)))
 
@@ -32,8 +32,8 @@
    (:! (:* fws))))
 
 ;a PGN tag is enclosed with []
-(define begin-tag (abnf:drop-consumed (abnf:char #\[ )))
-(define end-tag (abnf:drop-consumed (abnf:char #\] )))
+(define begin-tag (:! (abnf:char #\[ )))
+(define end-tag (:! (abnf:char #\] )))
 ;a PGN tag has a predefined string after [ 
 (define tag-key
   (abnf:bind-consumed->string
@@ -96,16 +96,36 @@
 (define sharpchar
   (abnf:char #\# ))
 (define dotchar
-  (abnf:drop-consumed (abnf:char #\.)))
+  (:! (abnf:char #\.)))
+(define lwsp
+  (:! abnf:lwsp))
+
 (define castling
   (abnf:concatenation
    (abnf:lit "O-O")
-   (abnf:repetition
-    (abnf:lit "-O"))))
+   (:?
+    (abnf:lit "-O"))
+   (:?
+    (abnf:lit "+"))
+   ))
 
-(define lwsp
-  (abnf:drop-consumed abnf:lwsp))
+(define result-text
+ (abnf:bind-consumed->string
+  (abnf:concatenation
+   (:+
+   (abnf:alternatives
+    (abnf:char #\1 )
+    (abnf:char #\2 )
+    (abnf:char #\0 )
+    (abnf:char #\* )
+    (abnf:char #\/ )
+    (abnf:char #\- )
+    )))
 
+   ))
+
+(define result (between-fws result-text ))
+	
 (define movetext-between-spaces
    (abnf:bind-consumed->string
     (abnf:alternatives
@@ -114,16 +134,17 @@
       (abnf:alternatives file piece)
       (abnf:alternatives file capturechar piece rank)
       (:*
-       (abnf:alternatives file piece rank annotation-symbol)))
+       (abnf:alternatives file piece capturechar rank annotation-symbol))
+      )     
      )))
 
 (define move-text (between-fws movetext-between-spaces ))
 
-					;move-number is the first ("3. ") number before the dot in the move..
+;move-number is the first ("3. ") number before the dot in the move..
 (define move-decimal
   (abnf:concatenation
    (abnf:bind-consumed->string
-    (abnf:repetition abnf:decimal))
+    (:+ abnf:decimal))
    dotchar
    lwsp))
 
@@ -147,20 +168,7 @@
     )))
 
 (define comment-text (between-fws comment ))
-
-
-
-(define result
- (abnf:bind-consumed->string
-  (abnf:alternatives
-   (abnf:lit "1-0")
-   (abnf:lit "0-1")
-   (abnf:lit "1/2-1/2")
-   (abnf:lit "*")
-   )))
-
-(define result-text (between-fws result ))
-					;move is a single move (3. Qe3!)
+				;move is a single move (3. Qe3!)
 (define move
   (abnf:concatenation
    move-decimal
@@ -168,33 +176,25 @@
    (:? comment-text)
    move-text
    (:? comment-text)
+   
    ))
 
 
+(define all-tags (:* tag))
+(define all-moves (abnf:concatenation
+		   (:+ move)
+		   (:+ result-text)
+		   ))
 
-
-(define all-moves
-(abnf:concatenation
- (:* move)
- result-text
- )
-  
-  
-  )
-
-;
-(define multi-tags
+(define game-body
   (abnf:concatenation
-   (:* tag)))
-
-
-(define pgn
-  (abnf:concatenation
-   multi-tags
+   all-tags
    lwsp
    all-moves
    ))
- 
+
+(define game (between-fws game-body ))
+(define pgn  (:+ game))
 
 
 ;;(define read-pgn
@@ -206,7 +206,7 @@
 ;;
 
 
-;(define parse-begin-tag (lex begin-tag err "["))
+					;(define parse-begin-tag (lex begin-tag err "["))
 
 					;(define parse (lex pgn err read-pgn))
 

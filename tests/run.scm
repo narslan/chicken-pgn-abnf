@@ -103,7 +103,7 @@
                (let ((inp (first p))
                      (res (second p)))
                 (let ((is (string->input-stream inp)))
-                 (pgn (lambda (s) (test (apply sprintf "~S -> ~S" p) res (car s))) err is))))
+                 (game (lambda (s) (test (apply sprintf "~S -> ~S" p) res (car s))) err is))))
         game-cases))
 
   
@@ -115,7 +115,7 @@
     (pgn car err `(() ,(->char-list s)))))
 
 (define read-pgn
-  (read-string #f (open-input-file "1.pgn"))
+  (read-string #f (open-input-file "Andersson.pgn"))
   )
 (print (parser read-pgn) )
 

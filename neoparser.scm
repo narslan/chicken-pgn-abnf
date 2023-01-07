@@ -16,6 +16,10 @@
 (define :* abnf:repetition)
 (define :+ abnf:repetition1)
 
+(define consumed-objects-lift-any
+  (abnf:consumed-objects-lift
+   (abnf:consumed-objects identity)))
+
 (define fws
   (abnf:concatenation
    (:?
@@ -36,8 +40,10 @@
 (define end-tag (:! (abnf:char #\] )))
 ;a PGN tag has a predefined string after [ 
 (define tag-key
-  (abnf:bind-consumed->string
-   (:* abnf:alpha)))
+  (abnf:bind-consumed-strings->list
+   'tagkey
+   (abnf:bind-consumed->string
+    (:* abnf:alpha))))
 
 
 (define atext
@@ -50,17 +56,17 @@
   (abnf:concatenation
    (:*
     (abnf:alternatives atext abnf:wsp)
-    )
-   ))
+    )))
 					; a tag value is  
 (define tag-value
+  
+  (abnf:bind-consumed-strings->list
+   'tagvalue
   (abnf:bind-consumed->string
    (abnf:concatenation
     (:! abnf:dquote)
     quoted-pair
-    (:! abnf:dquote)
-    )))
-
+    (:! abnf:dquote)))))
 
 (define tag
   (abnf:concatenation
@@ -109,38 +115,43 @@
     (abnf:lit "+"))
    ))
 
-(define result-variations 
+(define result-variations
+  
+  (abnf:bind-consumed-strings->list
+   'result
   (abnf:bind-consumed->string
    (abnf:alternatives
     (abnf:lit "1-0")
     (abnf:lit "0-1")
     (abnf:lit "1/2-1/2")
-    (abnf:lit "*")
-    )))
-
+    (abnf:lit "*")))))
 (define result (between-fws result-variations ))
-	
-(define movetext-between-spaces
-   (abnf:bind-consumed->string
-    (abnf:alternatives
-     castling
-     (abnf:concatenation
-      (abnf:alternatives file piece)
-      (abnf:alternatives file capturechar piece rank)
-      (:*
-       (abnf:alternatives file piece capturechar rank annotation-symbol))
-      )     
-     )))
 
-(define move-text (between-fws movetext-between-spaces ))
-
-;move-number is the first ("3. ") number before the dot in the move..
-(define move-decimal
+;;move-number is the first ("3. ") number before the dot in the move..
+(define move-number
+  (abnf:bind-consumed-strings->list
+   'movenumber
   (abnf:concatenation
    (abnf:bind-consumed->string
     (:+ abnf:decimal))
    dotchar
-   lwsp))
+   lwsp)))
+
+
+(define movetext-between-spaces
+  (abnf:bind-consumed-strings->list
+   'movetext
+  (abnf:bind-consumed->string
+   (abnf:alternatives
+    castling
+    (abnf:concatenation
+     (abnf:alternatives file piece)
+     (abnf:alternatives file capturechar piece rank)
+     (:*
+      (abnf:alternatives file piece capturechar rank annotation-symbol))   )))))
+
+(define move-text (between-fws movetext-between-spaces ))
+
 
 ;; Unicode variant of ctext
 (define unicode-ctext
@@ -150,6 +161,8 @@
     (char-set-difference char-set:full  char-set:ascii))))
 
 (define comment
+  (abnf:bind-consumed-strings->list
+   'comment
   (abnf:bind-consumed->string
    (abnf:concatenation 
     (:! (abnf:char #\{) )
@@ -158,29 +171,27 @@
       (:? fws)
       unicode-ctext))
     (:? fws)
-    (:! (abnf:char #\}))
-    )))
+    (:! (abnf:char #\}))))))
 
 (define comment-text (between-fws comment ))
-				;move is a single move (3. Qe3!)
 
-
-
-(define all-tags (:* tag))
+;;move is a single move (3. Qe3!)
 
 (define move
   (abnf:concatenation
-   move-decimal
+   move-number
    move-text
    (:? comment-text)
    (:? move-text)
    (:? comment-text)
-   (:? result)   
-   ))
+   (:? result)))
+
+
+(define all-tags (:* tag))
+
+
 (define all-moves (abnf:concatenation
-		   (:+ move)
-   
-		   ))
+		   (:+ move)))
 
 (define game-body
   (abnf:concatenation
@@ -191,19 +202,4 @@
 
 (define game (between-fws game-body ))
 (define pgn  (:+ game))
-
-
-;;(define read-pgn
-;;  (read-string #f (open-input-file "big.pgn"))
-;;
-;;)
-
-;;
-;;
-
-
-					;(define parse-begin-tag (lex begin-tag err "["))
-
-					;(define parse (lex pgn err read-pgn))
-
 

@@ -4,9 +4,7 @@
 	(prefix abnf-consumers abnf:)
 	(only lexgen lex)
 	test
-	fmt
-	
-	(only utf8-srfi-14 char-set char-set-difference char-set-union
+	( utf8-srfi-14 char-set char-set-difference char-set-union
 	      char-set:graphic char-set:printing char-set:ascii char-set:full))
 
 (define :? abnf:optional-sequence)

@@ -12,9 +12,6 @@
 
 (let* ((tag-cases
         `(
-
-
-	  
           ("[Event \"Havana    m.   \"]"  ((tagvalue "Havana    m.   ") (tagkey "Event")) ())
           ("[Event \"Havana m.\"]\n" ((tagvalue "Havana m.") (tagkey "Event")) ())
           ("[Event \"Havana m.\"]\r\n"  ((tagvalue "Havana m.") (tagkey "Event")) ())))    

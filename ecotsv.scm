@@ -35,14 +35,11 @@
 ;;setup pgn parser
 (define pgnparser
   (lambda (s)
-
     (if (equal? s "pgn") '()
-
 	(let* ([tokens (pgn car err `(() ,(->char-list s)))])
 	  (for-each
 	   (lambda (t)
-	     (display t)
-	    )
+	     (display t))
 	   tokens)
 	  (newline)
 	  )
@@ -51,24 +48,25 @@
 
 (define record-analyze
   (lambda (record)
-
-	      (let* ([openingName  (second record)]
-		     [pgnSource  (third record)]
-		     [uciSource  (fourth record)]
-		     [fenSource  (fifth record)]
-		     )
-		(pgnparser pgnSource)
-
-		)
-
-  )
-
-
+  
+    (let* ([openingName  (second record)]
+	   [pgnSource  (third record)]
+	   [uciSource  (fourth record)]
+	   [fenSource  (fifth record)]
+	   )
+      (begin
+	(pgnparser pgnSource)
+	) )
+    ))
 
 (let ((res (pcsv (->char-list file-to-string))))
   (for-each 
+   record-analyze
+   (map csv-record->list res)
+   ))
+  
 
 
-   )
-  ))
+
+  
 

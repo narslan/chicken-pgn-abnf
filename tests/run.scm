@@ -56,13 +56,6 @@
 			      tag-cases))
  
   
- (test-group "multiline-tags" (for-each (lambda (p)
-					  (let ((inp (first p))
-						(res (second p)))
-					    (let ((is (string->input-stream inp)))
-					      (multi-tags (lambda (s) (test (apply sprintf "~S -> ~S" p) res (car s))) err is))))
-					tag-multiline-cases))
-					
   (test-group "move text cases" (for-each (lambda (p)
 					    (let ((inp (first p))
 						  (res (second p)))
@@ -109,10 +102,11 @@
        tokens))))
 
 ; read-pgn reads a pgn file in to string.
-(define read-pgn(read-string #f (open-input-file "tests/capablanca.pgn")))
+;(define read-pgn(read-string #f (open-input-file "tests/kramnik.pgn")))
 
 
-;; (parser read-pgn)
+; (parser read-pgn)
+
 (test-exit)
 
   

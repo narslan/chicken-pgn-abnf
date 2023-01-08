@@ -110,6 +110,8 @@
 
 ; read-pgn reads a pgn file in to string.
 (define read-pgn(read-string #f (open-input-file "tests/capablanca.pgn")))
+
+
 ;; (parser read-pgn)
 (test-exit)
 

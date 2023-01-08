@@ -3,12 +3,17 @@
 	(chicken io)
 	srfi-1
 	utf8
-
+	
 	)
 
-
+(include "pgnparser-impl.scm")
 (define pcsv (make-parser #\tab))
 (define-values (fcell _ fcsv) (make-format #\tab))
+
+
+(define (err s)
+  (print "pgn message error on stream: " s)
+  (list)) ; ; (out)
 
 (define (->char-list s)
   (if (string? s) (string->list s) s))
@@ -25,14 +30,39 @@
 
 (define file-to-string(read-string #f (open-input-file "eco_lichess.tsv")))
 
+;;setup pgn parser
+(define pgnparser
+  (lambda (s)
+    (let* ([tokens (pgn car err `(() ,(->char-list s)))])
+      (for-each
+       (lambda (t)
+	 (let* ([token-key (first t)]
+		[token-value (second t)])
+	   (printf "~S ~S" token-key token-value))
+	 (newline)
+	 )
+       tokens))))
+
+
 (let ((res (pcsv (->char-list file-to-string))))
   (for-each (lambda (record)
+	      (let ([openingName  (second record)]
+		    [pgnSource  (third record)]
+		    [uciSource  (fourth record)]
+		    [fenSource  (fifth record)]
+		    )
+		(pgnparser pgnSource)
+		)
+
 	      (begin
-		(print (blue(second record)))
-		(print (red(third record)))
+
+		(print (underline(blue(second record)))) ;;name
+		(print (underline(red(third record))))   
 		(print (green(fourth record)))
 		(print (fifth record))
-	       )
-	     )
-
+		(newline)
+		)
+	      
+	      )
 	    (map csv-record->list res)))
+

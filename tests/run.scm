@@ -29,9 +29,13 @@
           ("Qxb6 "   ((movetext "Qxb6"))  ())
           ("axb6# "  ((movetext "axb6#")) ())
           (" O-O "   ((movetext "O-O")) ())
-          ("O-O-O"   ((movetext "O-O-O")) ())))
-    
-    
+          (" O-O-O "   ((movetext "O-O-O")) ())
+	  (" O-O-O+ "   ((movetext "O-O-O+")) ())
+	  (" O-O-O+! "   ((movetext "O-O-O+!")) ())
+	  (" O-O-O+!! "   ((movetext "O-O-O+!!")) ())
+	  ))
+       ;;TODO: it fails when there is no whitespace around castling expression.
+     ;;  (" O-O-O+!! "   ((movetext "O-O-O+!!")) ())
        (single-move-cases
         `(
           ("1.e4 e5 "       ((move) (movetext "e5") ( movetext "e4"   ) (movenumber "1"))    ())

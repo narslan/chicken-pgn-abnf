@@ -1,5 +1,6 @@
 (import 
 	(chicken io)
+	(chicken base)
 	(prefix abnf abnf:) 
 	(prefix abnf-consumers abnf:)
 	(only lexgen lex)
@@ -7,11 +8,16 @@
 	(only utf8-srfi-14 char-set char-set-difference char-set-union
 	      char-set:graphic char-set:printing char-set:ascii char-set:full))
 
+
+;;abbreviatons for some repeatedly used procuders. 
 (define :? abnf:optional-sequence)
 (define :! abnf:drop-consumed)
 (define :* abnf:repetition)
 (define :+ abnf:repetition1)
 
+;;following two definitions are from iraikov/internet-message
+;;they stand for Folding white space. It is very useful for this library.
+;;side remark: fws matches lots of space. (\s*(?![\r\n]+)?\s+?
 (define fws
   (abnf:concatenation
    (:?
@@ -21,44 +27,42 @@
       (abnf:alternatives abnf:crlf abnf:lf abnf:cr))))
    (:+ abnf:wsp)))
 
-
+;;look everything between ~lots of space~ and  ~lots of space~
 (define (between-fws p)
   (abnf:concatenation
    (:! (:* fws)) p 
    (:! (:* fws))))
 
-;a PGN tag is enclosed with []
+;;this is a PGN tag => [TAGKEY "TAGVALUE"]
 (define begin-tag (:! (abnf:char #\[ )))
 (define end-tag (:! (abnf:char #\] )))
-;a PGN tag has a predefined string after [ 
 (define tag-key
   (abnf:bind-consumed-strings->list
    'tagkey
    (abnf:bind-consumed->string
     (:* abnf:alpha))))
 
-
-(define atext
+;;from iraikov/internet-message
+;;matches a sequence of whitespace characters
+(define tagtext-characters
   (abnf:alternatives
    abnf:alpha abnf:decimal (abnf:set-from-string "():,!#$%&'*+-/=?^_`{|}~.")))
 
-
-;; Quoted characters
-(define quoted-pair
+;;matches a sequence of characters and whitespace 
+(define tagtext
   (abnf:concatenation
    (:*
-    (abnf:alternatives atext abnf:wsp)
-    )))
-					; a tag value is  
+    (abnf:alternatives tagtext-characters abnf:wsp))))
+
+       ;; a tag value is  
 (define tag-value
-  
   (abnf:bind-consumed-strings->list
    'tagvalue
-  (abnf:bind-consumed->string
-   (abnf:concatenation
-    (:! abnf:dquote)
-    quoted-pair
-    (:! abnf:dquote)))))
+   (abnf:bind-consumed->string
+    (abnf:concatenation
+     (:! abnf:dquote)
+     tagtext
+     (:! abnf:dquote)))))
 
 (define tag
   (abnf:concatenation
@@ -98,14 +102,18 @@
 (define lwsp
   (:! abnf:lwsp))
 
+(define castling-chars
+  (abnf:alternatives
+   annotation-symbol
+   (abnf:set-from-string "O-" )
+   )
+  )
 (define castling
   (abnf:concatenation
    (abnf:lit "O-O")
-   (:?
-    (abnf:lit "-O"))
-   (:?
-    (abnf:lit "+"))
-   ))
+   (:* castling-chars)
+   )
+  )
 
 (define result-variations
   

@@ -8,6 +8,11 @@
 	(only utf8-srfi-14 char-set char-set-difference char-set-union
 	      char-set:graphic char-set:printing char-set:ascii char-set:full))
 
+(define-record-type moves-record
+  (list->moves-record elems)
+  moves-record?
+  (elems moves-record->list))
+
 
 ;;abbreviatons for some repeatedly used procuders. 
 (define :? abnf:optional-sequence)
@@ -17,7 +22,8 @@
 
 ;;following two definitions are from iraikov/internet-message
 ;;they stand for Folding white space. It is very useful for this library.
-;;side remark: fws matches lots of space. (\s*(?![\r\n]+)?\s+?
+;;(\s*(?![\r\n]+)?\s+?
+
 (define fws
   (abnf:concatenation
    (:?
@@ -34,6 +40,7 @@
    (:! (:* fws))))
 
 ;;this is a PGN tag => [TAGKEY "TAGVALUE"]
+;; we define here matchers that makes up a tag
 (define begin-tag (:! (abnf:char #\[ )))
 (define end-tag (:! (abnf:char #\] )))
 (define tag-key
@@ -54,7 +61,7 @@
    (:*
     (abnf:alternatives tagtext-characters abnf:wsp))))
 
-       ;; a tag value is  
+;; a tag value is quoted 
 (define tag-value
   (abnf:bind-consumed-strings->list
    'tagvalue
@@ -138,9 +145,9 @@
    lwsp)))
 
 
-(define movetext-between-spaces
+(define ply-between-spaces
   (abnf:bind-consumed-strings->list
-   'movetext
+  list->moves-record
   (abnf:bind-consumed->string
    (abnf:alternatives
     castling
@@ -150,8 +157,7 @@
      (:*
       (abnf:alternatives file piece capturechar rank annotation-symbol))   )))))
 
-(define move-text (between-fws movetext-between-spaces ))
-
+(define ply (between-fws ply-between-spaces ))
 
 ;; Unicode variant of ctext
 (define unicode-ctext
@@ -178,17 +184,16 @@
 ;;move is a single move (3. Qe3!)
 
 (define move
-(abnf:bind-consumed-strings->list
- 'move
- (abnf:concatenation
-  move-number
-  move-text
-  (:? comment-text)
-  (:? move-text)
-  (:? comment-text)
-  (:? result))
- )
-  )
+  (abnf:concatenation
+   move-number
+   ply
+   (:* (abnf:alternatives
+	comment-text
+	ply
+	result
+))))
+
+  
 
 
 (define all-tags (:* tag))

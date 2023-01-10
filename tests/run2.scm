@@ -19,24 +19,37 @@
 	  ))
        (ply-cases
         `(
-          ("e4"     (( "e4"))    ())
-          ("Nf3"    (( "Nf3"))   ())
-          ("bxc3"   (( "bxc3"))  ())
-          ("axb6"   (( "axb6"))  ())
-          ("Qxb6"   (( "Qxb6"))  ())
-          ("axb6# "  (( "axb6#")) ())
-          ("O-O"   (( "O-O")) ())
-          ("O-O-O"   (( "O-O-O")) ())
-	  ("O-O-O+"   (( "O-O-O+")) ())
-	  ("O-O-O+! "   (( "O-O-O+!")) ())
-	  ("O-O-O+!!"   (( "O-O-O+!!")) ())
+          ("e4 "     (("e4"))    ())
+          ("Nf3 "    ("Nf3")   ())
+          ("bxc3 "   ("bxc3")  ())
+          ("axb6 "   ("axb6")  ())
+          ("Qxb6 "   ("Qxb6")  ())
+          ("axb6# "  ("axb6#") ())
+          ("O-O "   ("O-O") ())
+          ("O-O-O "   ( "O-O-O") ())
+	  ("O-O-O+ "   ("O-O-O+") ())
+	  
+	  ("O-O-O+!! "   (("O-O-O+!!")) ())
 	  ))
        
        (move-cases
         `(
-          ("1.e4 e5 "       (("e5") ( "e4") )    ())
-          ("29. Ng6 Nf3 "   (("Nf3") ( "Ng6"))   ())
-          ("45. Nf3 Bc3 "   (("Bc3") ( "Nf3" )))))
+          ("1.e4 e5 "       (("e4"  "e5") )    ())
+          ("29. Ng6 Nf4 "   (("Ng6" "Nf4") )   ())
+          ("45. Bc3 Qe8+ "   (("Bc3"  "Qe8+" ) ))))
+
+       (multiple-move-cases
+        `(
+          ("1.e4 e5 2. Nf4 Kh3 * "       (("e4"  "e5") )    ())
+          ("1.e4 e5 2. Nf4 Kh4 3. h6 "   (("Ng6" "Nf4") )   ())
+          ))
+
+        (multiple-tag-cases
+        `(
+          ("[Event \"Havana m.\"]\n[White \"Jose Capablanca\"]\n"       (("e4"  "e5") )    ())
+         
+          ))
+       
 )
 
  (test-group "tags"  (for-each(lambda (p)
@@ -59,6 +72,20 @@
 				  (let ((is (string->input-stream inp)))
 				    (move (lambda (s) (test (apply sprintf "~S -> ~S" p) res (car s))) err is))))
 			      move-cases))
+
+(test-group "multiple moves"  (for-each(lambda (p)
+				(let ((inp (first p))
+				      (res (second p)))
+				  (let ((is (string->input-stream inp)))
+				    (all-moves (lambda (s) (test (apply sprintf "~S -> ~S" p) res (car s))) err is))))
+			      multiple-move-cases))
+(test-group "multiple tags"  (for-each(lambda (p)
+				(let ((inp (first p))
+				      (res (second p)))
+				  (let ((is (string->input-stream inp)))
+				    (all-tags (lambda (s) (test (apply sprintf "~S -> ~S" p) res (car s))) err is))))
+			      multiple-tag-cases))
+
 
  )
 

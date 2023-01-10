@@ -25,7 +25,7 @@
 (define :+ abnf:repetition1)
 
 ;;they stand for Folding white space. 
-;;(\s*(?![\r\n]+)?\s+?
+;;(\s*(?![\r\n]+)?\s+
 
 (define fws
   (abnf:concatenation
@@ -49,11 +49,12 @@
 (define end-tag (:!   (abnf:char #\] )))
 
 (define tagkey
-  (abnf:bind-consumed->string
-   (abnf:concatenation
-    begin-tag
-    (:+ abnf:alpha)
-    (:! abnf:wsp))))
+  (abnf:bind-consumed-strings->list
+   (abnf:bind-consumed->string
+    (abnf:concatenation
+     begin-tag
+     (:+ abnf:alpha)
+     (:! abnf:wsp)))))
 
 ;;matches a sequence of characters and whitespace 
 (define ttext
@@ -65,20 +66,22 @@
     abnf:wsp)))
 
 (define tagvalue
+ (abnf:bind-consumed-strings->list
   (abnf:bind-consumed->string
-    (abnf:concatenation
-     (:! abnf:dquote)
-     ttext
-     (:! abnf:dquote)
-     end-tag)))
+   (abnf:concatenation
+    (:! abnf:dquote)
+    ttext
+    (:! abnf:dquote)
+    end-tag))))
  
-(define tag
+(define tag-text
   (abnf:bind-consumed-strings->list 
-   ;;list->tag-record
+   list->tag-record
    (abnf:concatenation
     tagkey
-    tagvalue)))
-
+    tagvalue
+    )))
+(define tag (between-fws tag-text ))
 
 ;; MOVE
 ;;character members of amove
@@ -119,8 +122,7 @@
     dotchar
     lwsp)))
 
-;; TAGLER ICIN BURAYA GEL
-(define ply
+(define ply-text
   (abnf:bind-consumed-strings->list
    (abnf:bind-consumed->string
     (abnf:alternatives
@@ -129,8 +131,10 @@
       (abnf:alternatives file piece)
       (abnf:alternatives file capturechar piece rank)
       (:*
-       (abnf:alternatives file piece capturechar rank annotation))   )))))
-
+       (abnf:alternatives file piece capturechar rank annotation))   )))
+   ))
+   
+(define ply (between-fws ply-text ))
 ;; unicode-ctext matches unicode characters for the comments.
 (define unicode-ctext
   (abnf:set
@@ -156,7 +160,7 @@
 ;;move is a single move (3. Qe3! Qe4)
 (define move
   (abnf:bind-consumed-strings->list 
-   ;;list->move-record
+   list->move-record
    (abnf:concatenation
     movenumber
     ply
@@ -167,7 +171,12 @@
 	 )))))
 
 (define all-tags (abnf:concatenation
-		  (:* tag)))
+		  (:* (abnf:concatenation
+		       tag
+		       (:! abnf:lwsp)
+		       ))
+		  
+		  ))
 
 (define all-moves (abnf:concatenation
 		   (:+ move)))
@@ -175,7 +184,6 @@
 (define game-body
   (abnf:concatenation
    all-tags
-   lwsp
    all-moves
    ))
 

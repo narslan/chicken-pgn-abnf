@@ -96,20 +96,16 @@
 (define annotation (abnf:set-from-string "=?!+#"))
 
 ;;TODO: use variable chars instead of *
-(define short-castle
- )
 
+(define castling
+  (abnf:concatenation
+   (abnf:lit "O-O")
+   (:?
+    (abnf:lit "-O"))
+   (:* annotation
+    )
+   ))
 
-(define castling-text
-  (abnf:bind-consumed-strings->list
-   ( abnf:bind-consumed->string
-     (abnf:concatenation
-      (abnf:lit "O-O")
-      (:*
-       (abnf:alternatives
-	annotation
-	(abnf:set-from-string "O-" )))))  ))
-(define castling (between-fws castling-text ))
 
 (define result-variations
   (abnf:bind-consumed->string
@@ -136,6 +132,7 @@
     (abnf:alternatives
      castling
      (abnf:concatenation
+      
       (abnf:alternatives file piece)
       (abnf:alternatives file capturechar piece rank)
       (:*

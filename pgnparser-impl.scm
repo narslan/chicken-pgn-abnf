@@ -95,13 +95,21 @@
 (define lwsp  (:! abnf:lwsp))
 (define annotation (abnf:set-from-string "=?!+#"))
 
-(define castling
-  (abnf:concatenation
-   (abnf:lit "O-O")
-   (:*
-    (abnf:alternatives
-     annotation
-     (abnf:set-from-string "O-" )))))
+;;TODO: use variable chars instead of *
+(define short-castle
+ )
+
+
+(define castling-text
+  (abnf:bind-consumed-strings->list
+   ( abnf:bind-consumed->string
+     (abnf:concatenation
+      (abnf:lit "O-O")
+      (:*
+       (abnf:alternatives
+	annotation
+	(abnf:set-from-string "O-" )))))  ))
+(define castling (between-fws castling-text ))
 
 (define result-variations
   (abnf:bind-consumed->string
@@ -170,17 +178,8 @@
 	 result
 	 )))))
 
-(define all-tags (abnf:concatenation
-		  (:* (abnf:concatenation
-		       tag
-		       (:! abnf:lwsp)
-		       ))
-		  
-		  ))
-
-(define all-moves (abnf:concatenation
-		   (:+ move)))
-
+(define all-tags (abnf:concatenation (:* tag)))
+(define all-moves (abnf:concatenation  (:+ move)))
 (define game-body
   (abnf:concatenation
    all-tags
@@ -188,5 +187,5 @@
    ))
 
 (define game (between-fws game-body ))
-(define pgn  (:+ game))
+(define pgn  (:+ game)  )
 

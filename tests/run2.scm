@@ -36,6 +36,7 @@
         `(
           ("1.e4 e5 "       (("e4"  "e5") )    ())
           ("29. Ng6 Nf4 "   (("Ng6" "Nf4") )   ())
+	  ("29. O-O O-O-O "   (("Ng6" "Nf4") )   ())
           ("45. Bc3 Qe8+ "   (("Bc3"  "Qe8+" ) ))))
 
        (multiple-move-cases
@@ -47,6 +48,12 @@
         (multiple-tag-cases
         `(
           ("[Event \"Havana m.\"]\n[White \"Jose Capablanca\"]\n"       (("e4"  "e5") )    ())
+         
+          ))
+
+	 (game-body-cases
+        `(
+          ("[Event \"Havana m.\"]\n[White \"Jose Capablanca\"]\n1.e4 e5 2.c3 O-O-O "       (("e4"  "e5") )    ())
          
           ))
        
@@ -85,7 +92,12 @@
 				  (let ((is (string->input-stream inp)))
 				    (all-tags (lambda (s) (test (apply sprintf "~S -> ~S" p) res (car s))) err is))))
 			      multiple-tag-cases))
-
+(test-group "game body cases"  (for-each(lambda (p)
+				(let ((inp (first p))
+				      (res (second p)))
+				  (let ((is (string->input-stream inp)))
+				    (game-body (lambda (s) (test (apply sprintf "~S -> ~S" p) res (car s))) err is))))
+			      game-body-cases))
 
  )
 

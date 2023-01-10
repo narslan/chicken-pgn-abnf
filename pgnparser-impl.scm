@@ -42,6 +42,7 @@
    (:! (:* fws)) p 
    (:! (:* fws))))
 
+;;TAG
 ;;this is a PGN tag => [TAGKEY "TAGVALUE"]
 ;; we define here matchers that makes up a tag
 (define begin-tag (:! (abnf:char #\[ )))
@@ -55,21 +56,21 @@
     (:! abnf:wsp))))
 
 ;;matches a sequence of characters and whitespace 
-(define tagvalue-characters
-  (abnf:alternatives
-   abnf:alpha
-   abnf:decimal
-   (abnf:set-from-string "():,!#$%&'*+-/=?^_`{|}~.")
-   abnf:wsp))
+(define ttext
+  (:*
+   (abnf:alternatives
+    abnf:alpha
+    abnf:decimal
+    (abnf:set-from-string "():,!#$%&'*+-/=?^_`{|}~.")
+    abnf:wsp)))
 
 (define tagvalue
   (abnf:bind-consumed->string
     (abnf:concatenation
      (:! abnf:dquote)
-     tagvalue-characters
+     ttext
      (:! abnf:dquote)
-     end-tag
-     )))
+     end-tag)))
  
 (define tag
   (abnf:bind-consumed-strings->list 
@@ -78,7 +79,8 @@
     tagkey
     tagvalue)))
 
-;;START MOVE
+
+;; MOVE
 ;;character members of amove
 (define piece  (abnf:set-from-string "KNRBQknrbq" ))
 (define rank  (abnf:set-from-string "12345678" ))
@@ -88,19 +90,15 @@
 (define sharpchar  (abnf:char #\# ))
 (define dotchar  (:! (abnf:char #\.)))
 (define lwsp  (:! abnf:lwsp))
-(define annotation 
-  (abnf:concatenation
-   (:* (abnf:set-from-string "=?!+#" ))))
-
-(define castling-chars
-  (abnf:alternatives
-   annotation
-   (abnf:set-from-string "O-" )))
+(define annotation (abnf:set-from-string "=?!+#"))
 
 (define castling
   (abnf:concatenation
    (abnf:lit "O-O")
-   (:* castling-chars)))
+   (:*
+    (abnf:alternatives
+     annotation
+     (abnf:set-from-string "O-" )))))
 
 (define result-variations
   (abnf:bind-consumed->string
@@ -112,18 +110,17 @@
   )
 (define result (between-fws result-variations ))
 
-;;move-number is the first ("3. ") number before the dot in the move.
+;;movenumber is the first ("3. ") number before the dot in the move.
 ;;we're discarding it, as it has no particular value.
-(define move-number
+(define movenumber
   (:!
    (abnf:concatenation
-    (abnf:bind-consumed->string
-     (:+ abnf:decimal))
+    (:+ abnf:decimal)
     dotchar
     lwsp)))
 
-
-(define ply-text
+;; TAGLER ICIN BURAYA GEL
+(define ply
   (abnf:bind-consumed-strings->list
    (abnf:bind-consumed->string
     (abnf:alternatives
@@ -133,8 +130,6 @@
       (abnf:alternatives file capturechar piece rank)
       (:*
        (abnf:alternatives file piece capturechar rank annotation))   )))))
-
-(define ply (between-fws ply-text) )
 
 ;; unicode-ctext matches unicode characters for the comments.
 (define unicode-ctext
@@ -163,7 +158,7 @@
   (abnf:bind-consumed-strings->list 
    ;;list->move-record
    (abnf:concatenation
-    move-number
+    movenumber
     ply
     (:* (abnf:alternatives
 	 comment

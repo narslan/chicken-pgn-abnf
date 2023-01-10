@@ -12,7 +12,7 @@
 
 (let* ((tag-cases
         `(
-          ("[Event \"Havana    m.   \"]"  (tag-record? ) ())
+          ("[Event \"Havana    m.   \"]"  (tag-record ) ())
           ("[Event \"Havana m.\"]\n" ((tagvalue "Havana m.") (tagkey "Event")) ())
           ("[Event \"Havana m.\"]\r\n"  ((tagvalue "Havana m.") (tagkey "Event")) ())))    
 
@@ -48,7 +48,7 @@
     
        (game-cases
         `(
-          ("[Event \"Istanbul\"]\n[WhiteELO \"2221\"]\n 1. c4 Nf3 2. Bf3 Nf6 \n 3. Ka1 *"
+          ("[Event \"Istanbul\"]\n[WhiteELO \"2221\"]\n 1. "
 	   ( )    ()))))
 
 
@@ -58,7 +58,7 @@
 					    (let ((inp (first p))
 						  (res (second p)))
 					      (let ((is (string->input-stream inp)))
-						(move-text (lambda (s) (test (apply sprintf "~S -> ~S" p) res (car s))) err is))))
+						(ply (lambda (s) (test (apply sprintf "~S -> ~S" p) res (car s))) err is))))
 					  move-text-cases))
   
   (test-group "single move cases" (for-each (lambda (p)

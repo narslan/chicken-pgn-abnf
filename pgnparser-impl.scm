@@ -8,11 +8,15 @@
 	(only utf8-srfi-14 char-set char-set-difference char-set-union
 	      char-set:graphic char-set:printing char-set:ascii char-set:full))
 
-(define-record-type moves-record
-  (list->moves-record elems)
-  moves-record?
-  (elems moves-record->list))
+(define-record-type move-record
+  (list->move-record elems)
+  move-record?
+  (elems move-record->list))
 
+(define-record-type tag-record
+  (list->tag-record elems)
+  tag-record?
+  (elems tag-record->list))
 
 ;;abbreviatons for some repeatedly used procuders. 
 (define :? abnf:optional-sequence)
@@ -44,12 +48,9 @@
 (define begin-tag (:! (abnf:char #\[ )))
 (define end-tag (:! (abnf:char #\] )))
 (define tag-key
-  (abnf:bind-consumed-strings->list
-   'tagkey
-   (abnf:bind-consumed->string
-    (:* abnf:alpha))))
+  (abnf:bind-consumed->string
+    (:+ abnf:alpha)))
 
-;;from iraikov/internet-message
 ;;matches a sequence of whitespace characters
 (define tagtext-characters
   (abnf:alternatives
@@ -57,30 +58,34 @@
 
 ;;matches a sequence of characters and whitespace 
 (define tagtext
-  (abnf:concatenation
-   (:*
-    (abnf:alternatives tagtext-characters abnf:wsp))))
+(abnf:bind-consumed->string
+ (abnf:concatenation
+  (:*
+   (abnf:alternatives tagtext-characters abnf:wsp)))))
 
 ;; a tag value is quoted 
 (define tag-value
-  (abnf:bind-consumed-strings->list
-   'tagvalue
-   (abnf:bind-consumed->string
-    (abnf:concatenation
+  (abnf:concatenation
      (:! abnf:dquote)
      tagtext
-     (:! abnf:dquote)))))
+     (:! abnf:dquote)))
+
+   
 
 (define tag
-  (abnf:concatenation
-   begin-tag
-   tag-key
-   (:! abnf:wsp)
-   tag-value
-   end-tag
-   (:!
-    (abnf:repetition
-     (abnf:set-from-string "\r\n")))))
+  (abnf:bind-consumed-strings->list 
+   list->tag-record
+   (abnf:concatenation
+    begin-tag
+    tag-key
+    (:! abnf:wsp)
+    tag-value
+    end-tag
+    (:!
+     (abnf:repetition
+      (abnf:set-from-string "\r\n"))))
+   )
+  )
 
 
 ;; Move definitons.
@@ -123,32 +128,29 @@
   )
 
 (define result-variations
-  
-  (abnf:bind-consumed-strings->list
-   'result
   (abnf:bind-consumed->string
    (abnf:alternatives
     (abnf:lit "1-0")
     (abnf:lit "0-1")
     (abnf:lit "1/2-1/2")
-    (abnf:lit "*")))))
+    (abnf:lit "*")))
+  )
 (define result (between-fws result-variations ))
 
-;;move-number is the first ("3. ") number before the dot in the move..
+;;move-number is the first ("3. ") number before the dot in the move.
+;;we're discarding it, as it has no particular value.
 (define move-number
-  (abnf:bind-consumed-strings->list
-   'movenumber
-  (abnf:concatenation
-   (abnf:bind-consumed->string
-    (:+ abnf:decimal))
-   dotchar
-   lwsp)))
+  (:!
+   (abnf:concatenation
+    (abnf:bind-consumed->string
+     (:+ abnf:decimal))
+    dotchar
+    lwsp)))
 
 
-(define ply-between-spaces
+(define ply-text
   (abnf:bind-consumed-strings->list
-  list->moves-record
-  (abnf:bind-consumed->string
+    (abnf:bind-consumed->string
    (abnf:alternatives
     castling
     (abnf:concatenation
@@ -157,33 +159,37 @@
      (:*
       (abnf:alternatives file piece capturechar rank annotation-symbol))   )))))
 
-(define ply (between-fws ply-between-spaces ))
+;;The move "1. c4 Nf3" has two plies.
+(define ply (between-fws ply-text) )
 
-;; Unicode variant of ctext
+;; unicode-ctext matches unicode characters for the comments.
 (define unicode-ctext
   (abnf:set
    (char-set-union
     (char-set-difference char-set:graphic (char-set #\{ #\} #\\))
     (char-set-difference char-set:full  char-set:ascii))))
 
+;; for the moment this library suppports comments within moves, not outside of tem. 
+
 (define comment
   (abnf:bind-consumed-strings->list
    'comment
-  (abnf:bind-consumed->string
-   (abnf:concatenation 
-    (:! (abnf:char #\{) )
-    (:*
-     (abnf:concatenation
-      (:? fws)
-      unicode-ctext))
-    (:? fws)
-    (:! (abnf:char #\}))))))
+   (abnf:bind-consumed->string
+    (abnf:concatenation 
+     (:! (abnf:char #\{) )
+     (:*
+      (abnf:concatenation
+       (:? fws)
+       unicode-ctext))
+     (:? fws)
+     (:! (abnf:char #\}))))))
 
 (define comment-text (between-fws comment ))
 
-;;move is a single move (3. Qe3!)
-
+;;move is a single move (3. Qe3! Qe4)
 (define move
+ (abnf:bind-consumed-strings->list 
+   list->move-record
   (abnf:concatenation
    move-number
    ply
@@ -191,13 +197,13 @@
 	comment-text
 	ply
 	result
-))))
-
+	)))
   
+  )
+ )
 
-
-(define all-tags (:* tag))
-
+(define all-tags (abnf:concatenation
+		  (:* tag)))
 
 (define all-moves (abnf:concatenation
 		   (:+ move)))

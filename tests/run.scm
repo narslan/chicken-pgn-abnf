@@ -8,11 +8,11 @@
 (define (string->input-stream s) `(() ,(string->list s)))
 (define (err s)
   (print "pgn message error on stream: " s)
-  (list)) ; ; (out) 
+  (list)) 
 
 (let* ((tag-cases
         `(
-          ("[Event \"Havana    m.   \"]"  ((tagvalue "Havana    m.   ") (tagkey "Event")) ())
+          ("[Event \"Havana    m.   \"]"  (tag-record? ) ())
           ("[Event \"Havana m.\"]\n" ((tagvalue "Havana m.") (tagkey "Event")) ())
           ("[Event \"Havana m.\"]\r\n"  ((tagvalue "Havana m.") (tagkey "Event")) ())))    
 
@@ -35,7 +35,7 @@
 	  (" O-O-O+!! "   ((movetext "O-O-O+!!")) ())
 	  ))
        ;;TODO: it fails when there is no whitespace around castling expression.
-     ;;  (" O-O-O+!! "   ((movetext "O-O-O+!!")) ())
+     ;;  ("O-O-O+!"   ((movetext "O-O-O+!!")) ())
        (single-move-cases
         `(
           ("1.e4 e5 "       ((move) (movetext "e5") ( movetext "e4"   ) (movenumber "1"))    ())
@@ -49,15 +49,9 @@
        (game-cases
         `(
           ("[Event \"Istanbul\"]\n[WhiteELO \"2221\"]\n 1. c4 Nf3 2. Bf3 Nf6 \n 3. Ka1 *"
-	   ("*" "Ka1" "3" "Nf6" "Bf3" "2" "Nf3" "c4" "1" "2221" "WhiteELO" "Istanbul" "Event" )    ()))))
+	   ( )    ()))))
 
 
- (test-group "tags"  (for-each(lambda (p)
-				(let ((inp (first p))
-				      (res (second p)))
-				  (let ((is (string->input-stream inp)))
-				    (tag (lambda (s) (test (apply sprintf "~S -> ~S" p) res (car s))) err is))))
-			      tag-cases))
  
   
   (test-group "move text cases" (for-each (lambda (p)
@@ -86,7 +80,16 @@
 				       (res (second p)))
 				   (let ((is (string->input-stream inp)))
 				     (game (lambda (s) (test (apply sprintf "~S -> ~S" p) res (car s))) err is))))
-			       game-cases)))
+			       game-cases))
+
+ (test-group "tags"  (for-each(lambda (p)
+				(let ((inp (first p))
+				      (res (second p)))
+				  (let ((is (string->input-stream inp)))
+				    (tag (lambda (s) (test (apply sprintf "~S -> ~S" p) res (car s))) err is))))
+			      tag-cases))
+
+ )
 
 
 (define (->char-list s) ""
@@ -106,10 +109,10 @@
        tokens))))
 
 ; read-pgn reads a pgn file in to string.
-;(define read-pgn(read-string #f (open-input-file "tests/kramnik.pgn")))
+;(define read-pgn(read-string #f (open-input-file "tests/Andersson.pgn")))
 
 
-; (parser read-pgn)
+ ;(parser read-pgn)
 
 (test-exit)
 

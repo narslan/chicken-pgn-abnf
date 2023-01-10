@@ -92,28 +92,6 @@
  )
 
 
-(define (->char-list s) ""
-  (if (string? s) (string->list s) s))
-
-;parser returns a list of gams a list of tags
-(define parser
-  (lambda (s)
-    (let* ([tokens (pgn car err `(() ,(->char-list s)))])
-      (for-each
-       (lambda (t)
-	 (let* ([token-key (first t)]
-		[token-value (second t)])
-	   (printf "~S ~S" token-key token-value))
-	 (newline)
-	 )
-       tokens))))
-
-; read-pgn reads a pgn file in to string.
-;(define read-pgn(read-string #f (open-input-file "tests/Andersson.pgn")))
-
-
- ;(parser read-pgn)
-
 (test-exit)
 
   

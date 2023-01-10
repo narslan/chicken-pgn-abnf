@@ -3,7 +3,7 @@
   srfi-1
   (chicken format))
 
-(include "pgnparser-impl.scm")
+(include-relative "../pgnparser-impl.scm")
 
 (define (string->input-stream s) `(() ,(string->list s)))
 (define (err s)

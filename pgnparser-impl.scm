@@ -69,11 +69,11 @@
      tagvalue-characters
      (:! abnf:dquote)
      end-tag
-     (abnf:alternatives abnf:crlf abnf:lf abnf:cr))))
+     )))
  
 (define tag
   (abnf:bind-consumed-strings->list 
-   list->tag-record
+   ;;list->tag-record
    (abnf:concatenation
     tagkey
     tagvalue)))
@@ -125,14 +125,14 @@
 
 (define ply-text
   (abnf:bind-consumed-strings->list
-    (abnf:bind-consumed->string
-   (abnf:alternatives
-    castling
-    (abnf:concatenation
-     (abnf:alternatives file piece)
-     (abnf:alternatives file capturechar piece rank)
-     (:*
-      (abnf:alternatives file piece capturechar rank annotation))   )))))
+   (abnf:bind-consumed->string
+    (abnf:alternatives
+     castling
+     (abnf:concatenation
+      (abnf:alternatives file piece)
+      (abnf:alternatives file capturechar piece rank)
+      (:*
+       (abnf:alternatives file piece capturechar rank annotation))   )))))
 
 (define ply (between-fws ply-text) )
 
@@ -160,16 +160,16 @@
 
 ;;move is a single move (3. Qe3! Qe4)
 (define move
- (abnf:bind-consumed-strings->list 
-   list->move-record
-  (abnf:concatenation
-   move-number
-   ply
-   (:* (abnf:alternatives
-	comment
-	ply
-	result
-	)))))
+  (abnf:bind-consumed-strings->list 
+   ;;list->move-record
+   (abnf:concatenation
+    move-number
+    ply
+    (:* (abnf:alternatives
+	 comment
+	 ply
+	 result
+	 )))))
 
 (define all-tags (abnf:concatenation
 		  (:* tag)))

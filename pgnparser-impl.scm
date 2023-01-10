@@ -60,39 +60,30 @@
 (define end-tag (:!   (abnf:char #\] )))
 
 (define tagkey
-  (abnf:bind-consumed-strings->list
-   (abnf:bind-consumed->string
-    (abnf:concatenation
-     begin-tag
-     (:+ abnf:alpha)
-     (:! abnf:wsp)))))
-
-;;matches a sequence of characters and whitespace 
-(define ttext
-  (:*
-   (abnf:alternatives
-    abnf:alpha
-    abnf:decimal
-    (abnf:set-from-string "():,!#$%&'*+-/=?^_`{|}~.")
-    abnf:wsp)))
-
-(define tagvalue
- (abnf:bind-consumed-strings->list
   (abnf:bind-consumed->string
    (abnf:concatenation
-    (:! abnf:dquote)
-    ttext
-    (:! abnf:dquote)
-    end-tag))))
+    begin-tag
+    (:+ abnf:alpha)
+    (:! abnf:wsp))))
+  
+
+(define tagvalue (abnf:bind-consumed->string
+		  (abnf:concatenation
+		   (:! abnf:dquote)
+		   (:*
+		     (abnf:alternatives
+		      abnf:alpha
+		      abnf:decimal
+		      (abnf:set-from-string "():,!#$%&'*+-/=?^_`{|}~.")
+		      abnf:wsp))
+		   (:! abnf:dquote)
+		   end-tag)  ))
  
-(define tag-text
-  (abnf:bind-consumed-strings->list 
-   list->tag-record
-   (abnf:concatenation
-    tagkey
-    tagvalue
-    )))
-(define tag (between-fws tag-text ))
+
+(define tag (abnf:bind-consumed-strings->list 
+	     (between-fws (abnf:concatenation
+			      tagkey
+			      tagvalue)) ))
 
 ;; MOVE
 ;;character members of amove
@@ -138,8 +129,7 @@
     lwsp)))
 
 (define ply-text
-  (abnf:bind-consumed-strings->list
-   (abnf:bind-consumed->string
+  (abnf:bind-consumed->string
     (abnf:alternatives
      castling
      (abnf:concatenation
@@ -147,8 +137,7 @@
       (abnf:alternatives file piece)
       (abnf:alternatives file capturechar piece rank)
       (:*
-       (abnf:alternatives file piece capturechar rank annotation))   )))
-   ))
+       (abnf:alternatives file piece capturechar rank annotation))   ))))
    
 (define ply (between-fws ply-text ))
 ;; unicode-ctext matches unicode characters for the comments.
@@ -158,7 +147,7 @@
     (char-set-difference char-set:graphic (char-set #\{ #\} #\\))
     (char-set-difference char-set:full  char-set:ascii))))
 
-;; for the moment this library suppports comments within moves, not outside of tem. 
+;; for the moment this library suppports comments within moves, not outside of moves. 
 
 (define comment-text
   (abnf:bind-consumed->string
@@ -175,16 +164,15 @@
 
 ;;move is a single move (3. Qe3! Qe4)
 (define move
-  (abnf:bind-consumed-strings->list 
-   list->move-record
+  (abnf:bind-consumed-strings->list
    (abnf:concatenation
     movenumber
     ply
     (:* (abnf:alternatives
-	 comment
+	 comment-text
 	 ply
 	 result
-	 )))))
+	)))))
 
 (define all-tags (abnf:concatenation (:* tag)))
 (define all-moves (abnf:concatenation  (:+ move)))

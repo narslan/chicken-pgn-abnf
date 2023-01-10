@@ -26,6 +26,6 @@
 	 )
        tokens))))
 
-(define read-pgn(read-string #f (open-input-file "testdata/1.pgn")))
+(define read-pgn(read-string #f (open-input-file "testdata/Adams.pgn")))
 
 (parser read-pgn)

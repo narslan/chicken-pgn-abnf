@@ -18,6 +18,11 @@
   tag-record?
   (elems tag-record->list))
 
+(define-record-type game-record
+  (list->game-record elems)
+  game-record?
+  (elems game-record->list))
+
 ;;abbreviatons for some repeatedly used procedures. 
 (define :? abnf:optional-sequence)
 (define :! abnf:drop-consumed)
@@ -41,11 +46,12 @@
   (abnf:concatenation
    (:! (:* fws)) p 
    (:! (:* fws))))
+
+;; TODO: it is not used, just keep here for a while as a reference.
 (define newlines
   (abnf:drop-consumed
-	       (:* 
-		(abnf:set-from-string "\r\n"))) 
-	      )
+   (:* 
+    (abnf:set-from-string "\r\n"))) )
   
 ;;TAG
 ;;this is a PGN tag => [TAGKEY "TAGVALUE"]
@@ -183,10 +189,12 @@
 (define all-tags (abnf:concatenation (:* tag)))
 (define all-moves (abnf:concatenation  (:+ move)))
 (define game
+ (abnf:bind-consumed-strings->list
+  list->game-record
   (abnf:concatenation
    all-tags
    all-moves
-   ))
+   )))
 
 
 (define pgn  (:+ game)  )

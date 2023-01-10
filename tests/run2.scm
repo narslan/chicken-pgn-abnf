@@ -54,7 +54,8 @@
 	 (game-body-cases
         `(
           ("[Event \"Havana m.\"]\n[White \"Jose Capablanca\"]\n1.e4 e5 2.c3 O-O-O "       (("e4"  "e5") )    ())
-         
+	  ("[Event \"Havana m.\"]\n[White \"Jose Capablanca\"]\n1.e4 e5 2.c3 O-O-O \n"       (("e4"  "e5") )    ())
+	  
           ))
        
 )
@@ -96,7 +97,7 @@
 				(let ((inp (first p))
 				      (res (second p)))
 				  (let ((is (string->input-stream inp)))
-				    (game-body (lambda (s) (test (apply sprintf "~S -> ~S" p) res (car s))) err is))))
+				    (pgn (lambda (s) (test (apply sprintf "~S -> ~S" p) res (car s))) err is))))
 			      game-body-cases))
 
  )

@@ -41,7 +41,12 @@
   (abnf:concatenation
    (:! (:* fws)) p 
    (:! (:* fws))))
-
+(define newlines
+  (abnf:drop-consumed
+	       (:* 
+		(abnf:set-from-string "\r\n"))) 
+	      )
+  
 ;;TAG
 ;;this is a PGN tag => [TAGKEY "TAGVALUE"]
 ;; we define here matchers that makes up a tag
@@ -177,12 +182,12 @@
 
 (define all-tags (abnf:concatenation (:* tag)))
 (define all-moves (abnf:concatenation  (:+ move)))
-(define game-body
+(define game
   (abnf:concatenation
    all-tags
    all-moves
    ))
 
-(define game (between-fws game-body ))
+
 (define pgn  (:+ game)  )
 

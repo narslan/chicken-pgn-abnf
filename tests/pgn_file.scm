@@ -14,16 +14,15 @@
 (define (->char-list s) ""
   (if (string? s) (string->list s) s))
 
-;parser returns a list of gams a list of tags
+;parser returns a list of games a list of tags
 (define parser
   (lambda (s)
     (let* ([tokens (pgn car err `(() ,(->char-list s)))])
       (for-each
        (lambda (t)
-	 (let* ([token-key (first t)]
-		[token-value (second t)])
-	   (printf "~S ~S" token-key token-value))
-	 (newline)
+	 
+	 (print t)
+	 
 	 )
        tokens))))
 

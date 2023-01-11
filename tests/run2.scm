@@ -14,9 +14,8 @@
         `(
           ("[Event \"Havana    m.   \"]"  (("Event"  "Havana    m.   ")) ())
           ("[Event \"Havana m.\"]\n" (("Event" "Havana m.") ) ())
-	  ("[Event \"Havana m.\"]\r\n" (("Event" "Havana m.") ) ())
-
-	  ))
+	        ("[Event \"Havana m.\"]\r\n" (("Event" "Havana m.") ) ())
+	        ))
        (ply-cases
         `(
           ("e4 "     ("e4")    ())
@@ -28,36 +27,25 @@
           (" O-O "   ("O-O") ())
           (" O-O-O "   ( "O-O-O") ())
 	  (" O-O-O+ "   ("O-O-O+") ())
-	  (" O-O-O+!! "   ("O-O-O+!!") ())
-	  ))
-       
+	  (" O-O-O+!! "   ("O-O-O+!!") ())))
        (move-cases
         `(
           ("1.e4 e5 "       (("e4"  "e5") )    ())
           ("29. Ng6 Nf4 "   (("Ng6" "Nf4") )   ())
-	  ("29. O-O O-O-O "   (("O-O" "O-O-O") )   ())
+	        ("29. O-O O-O-O "   (("O-O" "O-O-O") )   ())
           ("45. Bc3 Qe8+ "   (("Bc3"  "Qe8+" ) ))))
-
        (multiple-move-cases
         `(
           ("1.e4 e5 2. Nf4 Kh3 * "       (("e4"  "e5") )    ())
-          ("1.e4 e5 2. Nf4 Kh4 3. h6 "   (("Ng6" "Nf4") )   ())
-          ))
-
-        (multiple-tag-cases
+          ("1.e4 e5 2. Nf4 Kh4 3. h6 "   (("Ng6" "Nf4") )   ())))
+       (multiple-tag-cases
         `(
-          ("[Event \"Havana m.\"]\n[White \"Jose Capablanca\"]\n"       (("e4"  "e5") )    ())
-         
-          ))
-
-	 (game-body-cases
+          ("[Event \"Havana m.\"]\n[White \"Jose Capablanca\"]\n"       (("e4"  "e5") )    ())))
+	     (game-body-cases
         `(
           ("[Event \"Havana m.\"]\n[White \"Jose Capablanca\"]\n1.e4 e5 2.c3 O-O-O "       (("e4"  "e5") )    ())
-	  ("[Event \"Havana m.\"]\n[White \"Jose Capablanca\"]\n1.e4 e5 2.c3 O-O-O \n"       (("e4"  "e5") )    ())
-	  
-          ))
-       
-)
+	        ("[Event \"Havana m.\"]\n[White \"Jose Capablanca\"]\n1.e4 e5 2.c3 O-O-O \n"       (("e4"  "e5") )    ())))
+   )
 
  (test-group "tags"  (for-each(lambda (p)
 				(let ((inp (first p))
@@ -100,10 +88,5 @@
 			      game-body-cases))
 
  )
-
-
-
 (test-exit)
-
-  
 

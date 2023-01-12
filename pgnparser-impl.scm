@@ -152,14 +152,14 @@
     lwsp)))
 
 (define ply-text
-  (abnf:bind-consumed->string
-    (abnf:alternatives
-     castling
-     (abnf:concatenation
-      (abnf:alternatives file piece)
-      (abnf:alternatives file capturechar piece rank)
-      (:*
-       (abnf:alternatives file piece capturechar rank annotation))   ))))
+(abnf:bind-consumed->string
+  (abnf:alternatives
+   castling
+   (abnf:concatenation
+    (abnf:alternatives file piece)
+    (abnf:alternatives file capturechar piece rank)
+    (:*
+     (abnf:alternatives file piece capturechar rank annotation))))))
    
 (define ply (between-fws ply-text ) )
 

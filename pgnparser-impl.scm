@@ -1,6 +1,6 @@
 (import 
 	(chicken io)
-	(chicken base)
+
 	(prefix abnf abnf:) 
 	(prefix abnf-consumers abnf:)
 	(only lexgen lex)
@@ -22,6 +22,7 @@
   (list->game-record elems)
   game-record?
   (elems game-record->list))
+
 
 ;;abbreviatons for some repeatedly used procedures. 
 (define :? abnf:optional-sequence)
@@ -65,25 +66,25 @@
     begin-tag
     (:+ abnf:alpha)
     (:! abnf:wsp))))
-  
 
-(define tagvalue (abnf:bind-consumed->string
-		  (abnf:concatenation
-		   (:! abnf:dquote)
-		   (:*
-		     (abnf:alternatives
-		      abnf:alpha
-		      abnf:decimal
-		      (abnf:set-from-string "():,!#$%&'*+-/=?^_`{|}~.")
-		      abnf:wsp))
-		   (:! abnf:dquote)
-		   end-tag)  ))
+(define tagvalue
+  (abnf:concatenation
+   (:! abnf:dquote)
+   (abnf:bind-consumed->string
+    (:*
+     (abnf:alternatives
+      abnf:alpha
+      abnf:decimal
+      abnf:wsp)))
+   (:! abnf:dquote)
+   end-tag))
  
 
-(define tag (abnf:bind-consumed-strings->list 
-	     (between-fws (abnf:concatenation
-			      tagkey
-			      tagvalue)) ))
+(define tag (abnf:bind-consumed-strings->list
+	     list->tag-record
+	     (abnf:concatenation
+			   tagkey
+			   tagvalue) ))
 
 ;; MOVE
 ;;character members of amove
@@ -171,19 +172,24 @@
     (:* (abnf:alternatives
 	 comment-text
 	 ply
-	 result
-	)))))
+	 result)))))
 
-(define all-tags (abnf:concatenation (:* tag)))
+(define all-tags
+  (:*
+   (abnf:concatenation 
+    tag
+    (:!
+     (:+ 
+      (abnf:set-from-string "\r\n"))))))
+
 (define all-moves (abnf:concatenation  (:+ move)))
-(define game
- (abnf:bind-consumed-strings->list
-  list->game-record
-  (abnf:concatenation
-   all-tags
-   all-moves
-   )))
 
+(define game
+  (abnf:bind-consumed-strings->list
+   list->game-record
+   (abnf:concatenation
+    all-tags
+    all-moves)))
 
 (define pgn  (:+ game)  )
 

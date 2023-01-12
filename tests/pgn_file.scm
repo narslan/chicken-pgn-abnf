@@ -20,12 +20,11 @@
     (let* ([tokens (pgn car err `(() ,(->char-list s)))])
       (for-each
        (lambda (t)
-	 
+	 (print "-----")
 	 (print t)
-	 
 	 )
        tokens))))
 
-(define read-pgn(read-string #f (open-input-file "testdata/Adams.pgn")))
+(define read-pgn(read-string #f (open-input-file "testdata/1.pgn")))
 
 (parser read-pgn)

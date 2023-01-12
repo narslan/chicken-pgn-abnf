@@ -81,7 +81,7 @@
  
 
 (define tag (abnf:bind-consumed-strings->list
-	     list->tag-record
+	     tag-record
 	     (abnf:concatenation
 			   tagkey
 			   tagvalue) ))
@@ -120,27 +120,6 @@
   )
 (define result (between-fws result-variations ))
 
-;;movenumber is the first ("3. ") number before the dot in the move.
-;;we're discarding it, as it has no particular value.
-(define movenumber
-  (:!
-   (abnf:concatenation
-    (:+ abnf:decimal)
-    dotchar
-    lwsp)))
-
-(define ply-text
-  (abnf:bind-consumed->string
-    (abnf:alternatives
-     castling
-     (abnf:concatenation
-      
-      (abnf:alternatives file piece)
-      (abnf:alternatives file capturechar piece rank)
-      (:*
-       (abnf:alternatives file piece capturechar rank annotation))   ))))
-   
-(define ply (between-fws ply-text ))
 ;; unicode-ctext matches unicode characters for the comments.
 (define unicode-ctext
   (abnf:set
@@ -163,17 +142,39 @@
 
 (define comment (between-fws comment-text ))
 
+;;movenumber is the first ("3. ") number before the dot in the move.
+;;we're discarding it, as it has no particular value.
+(define movenumber
+  (:!
+   (abnf:concatenation
+    (:+ abnf:decimal)
+    dotchar
+    lwsp)))
+
+(define ply-text
+  (abnf:bind-consumed->string
+    (abnf:alternatives
+     castling
+     (abnf:concatenation
+      (abnf:alternatives file piece)
+      (abnf:alternatives file capturechar piece rank)
+      (:*
+       (abnf:alternatives file piece capturechar rank annotation))   ))))
+   
+(define ply (between-fws ply-text ) )
+
 ;;move is a single move (3. Qe3! Qe4)
 (define move
   (abnf:bind-consumed-strings->list
+   move-record
    (abnf:concatenation
     movenumber
     ply
     (:* (abnf:alternatives
-	 comment-text
+	 comment
 	 ply
-	 result)))))
-
+	 result)))
+   ))
 (define all-tags
   (:*
    (abnf:concatenation 
@@ -182,11 +183,11 @@
      (:+ 
       (abnf:set-from-string "\r\n"))))))
 
-(define all-moves (abnf:concatenation  (:+ move)))
+(define all-moves 		   (:+ move))
 
 (define game
   (abnf:bind-consumed-strings->list
-   list->game-record
+   game-record
    (abnf:concatenation
     all-tags
     all-moves)))

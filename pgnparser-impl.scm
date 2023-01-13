@@ -1,13 +1,14 @@
 (import 
 	(chicken io)
-
 	(prefix abnf abnf:) 
 	(prefix abnf-consumers abnf:)
 	(only lexgen lex)
 	test
 	(only utf8-srfi-14 char-set char-set-difference char-set-union
 	      char-set:graphic char-set:printing char-set:ascii char-set:full))
+
 (include-relative "matchers.scm")
+
 (define-record-type move-record
   (list->move-record elems)
   move-record?
@@ -23,48 +24,11 @@
   game-record?
   (elems game-record->list))
 
-
-;;abbreviatons for some repeatedly used procedures. 
-(define :? abnf:optional-sequence)
-(define :! abnf:drop-consumed)
-(define :* abnf:repetition)
-(define :+ abnf:repetition1)
-
-;;they stand for Folding white space. 
-;;(\s*(?![\r\n]+)?\s+
-
-(define fws
-  (abnf:concatenation
-   (:?
-    (abnf:concatenation
-     (:* abnf:wsp)
-     (:* 
-      (abnf:alternatives abnf:crlf abnf:lf abnf:cr))))
-   (:+ abnf:wsp)))
-
-;;look everything between ~lots of space~ and  ~lots of space~
-(define (between-fws p)
-  (abnf:concatenation
-   (:! (:* fws)) p 
-   (:! (:* fws))))
-
-;; 
-(define newlines
-  (abnf:drop-consumed
-   (:* 
-    (abnf:set-from-string "\r\n"))) )
-  
-;;TAG
-;;this is a PGN tag => [TAGKEY "TAGVALUE"]
-;; we define here matchers that makes up a tag
-(define begin-tag (:! (abnf:char #\[ )))
-(define end-tag (:!   (abnf:char #\] )))
+;Tag
 
 (define tagkey
   (abnf:bind-consumed->string
    (abnf:concatenation (:+ abnf:alpha))))
-
-
 
 (define tagvalue
   (abnf:concatenation (:! abnf:dquote)
@@ -74,7 +38,6 @@
 			    abnf:wsp)))
 		      (:! abnf:dquote)))
  
-
 (define tag (abnf:bind-consumed-strings->list
 	     tag-record
 	     (abnf:concatenation
@@ -84,8 +47,8 @@
 	      tagvalue
 	      end-tag)))
 
-;; MOVE
-;;character members of amove
+;;Move
+
 (define piece  (abnf:set-from-string "KNRBQknrbq" ))
 (define rank  (abnf:set-from-string "12345678" ))
 (define file  (abnf:set-from-string "abcdefgh" ))
@@ -96,8 +59,6 @@
 (define lwsp  (:! abnf:lwsp))
 (define annotation (abnf:set-from-string "=?!+#"))
 
-;;TODO: use variable chars instead of *
-
 (define castling
   (abnf:concatenation
    (abnf:lit "O-O")
@@ -105,25 +66,15 @@
     (abnf:lit "-O"))
    (:* annotation)))
 
-
 (define result-variations
   (abnf:bind-consumed->string
    (abnf:alternatives
     (abnf:lit "1-0")
     (abnf:lit "0-1")
     (abnf:lit "1/2-1/2")
-    (abnf:lit "*")))
-  )
+    (abnf:lit "*"))))
+
 (define result (between-fws result-variations ))
-
-;; unicode-ctext matches unicode characters for the comments.
-(define unicode-ctext
-  (abnf:set
-   (char-set-union
-    (char-set-difference char-set:graphic (char-set #\{ #\} #\\))
-    (char-set-difference char-set:full  char-set:ascii))))
-
-;; for the moment this library suppports comments within moves, not outside of moves. 
 
 (define comment-text
   (abnf:bind-consumed->string
@@ -138,8 +89,6 @@
 
 (define comment (between-fws comment-text ))
 
-;;movenumber is the first ("3. ") number before the dot in the move.
-;;we're discarding it, as it has no particular value.
 (define movenumber
   (:!
    (abnf:concatenation
@@ -159,7 +108,6 @@
    
 (define ply (between-fws ply-text ) )
 
-;;move is a single move (3. Qe3! Qe4)
 (define move
   (abnf:bind-consumed-strings->list
    move-record
@@ -169,17 +117,15 @@
     (:* (abnf:alternatives
 	 comment
 	 ply
-	 result)))
-   ))
+	 result)))))
+
 (define all-tags
   (:*
    (abnf:concatenation 
     tag
-    (:!
-     (:+ 
-      (abnf:set-from-string "\r\n"))))))
+    newlines)))
 
-(define all-moves 		   (:+ move))
+(define all-moves (:+ move))
 
 (define game
   (abnf:bind-consumed-strings->list
@@ -188,4 +134,4 @@
     all-tags
     all-moves)))
 
-(define pgn  (:+ game)  )
+(define pgn (:+ game))

@@ -7,7 +7,7 @@
 	test
 	(only utf8-srfi-14 char-set char-set-difference char-set-union
 	      char-set:graphic char-set:printing char-set:ascii char-set:full))
-
+(include-relative "matchers.scm")
 (define-record-type move-record
   (list->move-record elems)
   move-record?
@@ -48,7 +48,7 @@
    (:! (:* fws)) p 
    (:! (:* fws))))
 
-;; TODO: it is not used, just keep here for a while as a reference.
+;; 
 (define newlines
   (abnf:drop-consumed
    (:* 
@@ -62,29 +62,27 @@
 
 (define tagkey
   (abnf:bind-consumed->string
-   (abnf:concatenation
-    begin-tag
-    (:+ abnf:alpha)
-    (:! abnf:wsp))))
+   (abnf:concatenation (:+ abnf:alpha))))
+
+
 
 (define tagvalue
-  (abnf:concatenation
-   (:! abnf:dquote)
-   (abnf:bind-consumed->string
-    (:*
-     (abnf:alternatives
-      abnf:alpha
-      abnf:decimal
-      abnf:wsp)))
-   (:! abnf:dquote)
-   end-tag))
+  (abnf:concatenation (:! abnf:dquote)
+		      (abnf:bind-consumed->string
+		       (:* (abnf:alternatives
+			    ttext
+			    abnf:wsp)))
+		      (:! abnf:dquote)))
  
 
 (define tag (abnf:bind-consumed-strings->list
 	     tag-record
 	     (abnf:concatenation
-			   tagkey
-			   tagvalue) ))
+	      begin-tag
+	      tagkey
+	      (:! abnf:wsp)
+	      tagvalue
+	      end-tag)))
 
 ;; MOVE
 ;;character members of amove
@@ -105,9 +103,7 @@
    (abnf:lit "O-O")
    (:?
     (abnf:lit "-O"))
-   (:* annotation
-    )
-   ))
+   (:* annotation)))
 
 
 (define result-variations
@@ -193,4 +189,3 @@
     all-moves)))
 
 (define pgn  (:+ game)  )
-

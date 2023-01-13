@@ -42,9 +42,7 @@
 	     (display t))
 	   tokens)
 	  (newline)
-	  )
-	)
-        ))
+	  ))))
 
 (define record-analyze
   (lambda (record)

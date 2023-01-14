@@ -67,11 +67,12 @@
    (:* annotation)))
 
 (define result-variations
-  (abnf:alternatives
+  (abnf:bind-consumed->string
+   (abnf:alternatives
     (abnf:lit "1-0")
     (abnf:lit "0-1")
     (abnf:lit "1/2-1/2")
-    (abnf:lit "*")))
+    (abnf:lit "*"))))
 
 (define result (between-fws result-variations ))
 
@@ -96,28 +97,27 @@
     lwsp)))
 
 (define ply-text
+(abnf:bind-consumed->string
   (abnf:alternatives
    castling
    (abnf:concatenation
     (abnf:alternatives file piece)
     (abnf:alternatives file capturechar piece rank)
     (:*
-     (abnf:alternatives file piece capturechar rank annotation)))))
+     (abnf:alternatives file piece capturechar rank annotation))))))
    
 (define ply (between-fws ply-text ) )
-
-
 
 (define move
   (abnf:bind-consumed-strings->list
    move-record
    (abnf:concatenation
     movenumber
-    (abnf:bind-consumed->string ply )
+    ply
     (:* (abnf:alternatives
 	 comment
-	 (abnf:bind-consumed->string ply )
-	 (abnf:bind-consumed->string result))))))
+	 ply
+	 result)))))
 
 (define all-tags
   (:*

@@ -1,8 +1,10 @@
 (import 
   test
-  srfi-1
   (chicken string)
-  (chicken format))
+  (chicken format)
+  test
+  iterators
+  )
 
 (include-relative "../pgnparser-impl.scm")
 
@@ -17,32 +19,66 @@
 (define (underline x) (string-append "\x1B[4m" (->string x) "\x1B[0m"))
 
 
-(define (string->input-stream s) `(() ,(string->list s)))
+(define (string->input-stream s) (string->list s) )
 (define (err s)
   (print "pgn message error on stream: " s)
   (list))
 
-
-(define (->char-list s) ""
-  (if (string? s) (string->list s) s))
-
 ;parser returns a list of games a list of tags
-(define parser
-  (lambda (s)
-    (let* (
-	   [tokens (reverse (pgn car err `(() ,(->char-list s))))]
-	   [counter 0]
-	   )
+(define (extract-games s)
+   (let* (
+	   [tokens (reverse (pgn car err `(() ,(string->input-stream s))))]
+	   [counter 0])
       (for-each
        (lambda (t)
-	 (cond ((equal? 'move-record (car t)) (display (red (cdr t))))
+	 (cond ((equal? 'move-record (car t)) (display (green (cdr t))) )
 	       ((equal? 'tag-record (car t)) (print (blue (cdr t))) )
-	       ((equal? 'game-record (car t)) (
-					       print (yellow (car t))) )
-	       (else (print t))
-	       ))
-       tokens))))
+	       (else (print t)))
+	 )
+       tokens)))
+ ;; ((equal? 'tag-record (car t)) (print (blue (cdr t))) )
+ ;; 	       ((equal? 'game-record (car t)) (
+ ;; 					       print (yellow (car t))) )
+(define (read-it file)
+  (let ([fh (open-input-file file)])
+    (let loop ([c (read-line fh)])
+      (if (eof-object? c)
+          (close-input-port fh)
+          (begin
+	    
+            (loop (read-line fh)))))))
 
-(define read-pgn(read-string #f (open-input-file "testdata/1.pgn")))
 
-(parser read-pgn)
+(define read-pgn-string(read-string #f (open-input-file "testdata/1.pgn")))
+(define read-pgn-iterativ(read-it "testdata/1.pgn"))
+(time (extract-games read-pgn-string))
+
+
+(define-iterator (ping)
+  (let loop ()
+      (yield 'ping)
+    (loop)))
+
+(define-iterator (pong)
+  (let loop ()
+  
+    (yield 'pong)
+    (loop)))
+
+
+
+(define (ping-pong n)
+  (let loop ((k 0) (ci (coroutine (ping))) (co (coroutine (pong))))
+    (cond
+     ((= k n)
+      (print 'Finish))
+     ((< k n)
+      (print (co-value ci) " " (co-value co))
+      (loop (+ k 1) (co-move ci) (co-move co))))))
+
+
+
+;; (ping-pong 10)
+
+
+(test-exit)

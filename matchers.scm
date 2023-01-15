@@ -1,4 +1,3 @@
-
 ;;abbreviatons for some regularly used procedures. 
 (define :? abnf:optional-sequence)
 (define :! abnf:drop-consumed)

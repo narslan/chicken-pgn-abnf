@@ -116,31 +116,15 @@
 	 (abnf:bind-consumed->string ply) 
 	 (abnf:bind-consumed->string result))))))
 
-;used to find end of pgn
-(define moves-without-result
-  (abnf:bind-consumed-strings->list
-   (abnf:concatenation
-    movenumber
-    (abnf:bind-consumed->string ply) 
-    (:* (abnf:alternatives
-	 comment
-	 (abnf:bind-consumed->string ply) 
-	 )))))
 
-(define all-moves-with-result
-  (abnf:concatenation
-   (:+ moves-without-result)
-   (abnf:bind-consumed->string result)
-   ))
+(define all-tags
+  (:*
+   (abnf:concatenation 
+    tag
+    newlines)))
 
+(define all-moves (:+ move))
 
-  (define all-tags
-    (:*
-     (abnf:concatenation 
-      tag
-      newlines)))
-
-  (define all-moves 		   (:+ move))
 (define game
   (abnf:bind-consumed-strings->list
    'game
@@ -151,21 +135,3 @@
 (define pgn (:+ game))
 
 
-(define-iterator (ping)
-  (let loop ()
-    (yield 'ping)
-    (loop)))
-
-(define-iterator (pong)
-  (let loop ()
-    (yield 'pong)
-    (loop)))
-
-(define (ping-pong n)
-  (let loop ((k 0) (ci (coroutine (ping))) (co (coroutine (pong))))
-    (cond
-      ((= k n)
-       (print 'Finish))
-      ((< k n)
-       (print (co-value ci) " " (co-value co))
-       (loop (+ k 1) (co-move ci) (co-move co))))))

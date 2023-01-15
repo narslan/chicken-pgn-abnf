@@ -24,61 +24,82 @@
   (print "pgn message error on stream: " s)
   (list))
 
-;parser returns a list of games a list of tags
+(define (err-plain s)
+  'error)
+
+
+					;parser returns a list of games a list of tags
 (define (extract-games s)
-   (let* (
-	   [tokens (reverse (pgn car err `(() ,(string->input-stream s))))]
-	   [counter 0])
-      (for-each
-       (lambda (t)
-	 (cond ((equal? 'move-record (car t)) (display (green (cdr t))) )
-	       ((equal? 'tag-record (car t)) (print (blue (cdr t))) )
-	       (else (print t)))
-	 )
-       tokens)))
+  (let* (
+	 [tokens (reverse (pgn car err `(() ,(string->input-stream s))))]
+	 [counter 0])
+    (for-each
+     (lambda (t)
+       (cond ((equal? 'move (car t)) (display (green (cdr t))) )
+	     ((equal? 'tag (car t)) (print (blue (cdr t))) )
+	     (else (print t)))
+       )
+     tokens)))
  ;; ((equal? 'tag-record (car t)) (print (blue (cdr t))) )
  ;; 	       ((equal? 'game-record (car t)) (
  ;; 					       print (yellow (car t))) )
-(define (read-it file)
-  (let ([fh (open-input-file file)])
-    (let loop ([c (read-line fh)])
-      (if (eof-object? c)
-          (close-input-port fh)
-          (begin
-	    
-            (loop (read-line fh)))))))
 
-
-(define read-pgn-string(read-string #f (open-input-file "testdata/1.pgn")))
-(define read-pgn-iterativ(read-it "testdata/1.pgn"))
-(time (extract-games read-pgn-string))
-
+(define (result-line? line)
+  (let* ([tokens (all-moves-with-result car err-plain `(() ,(string->input-stream line)))])
+    (if (list? tokens)	#t #f))
+  )
 
 (define-iterator (ping)
   (let loop ()
-      (yield 'ping)
+    (yield 'ping)
     (loop)))
+
+(define (read-it file)
+  (let ([fh (open-input-file file)])
+    (let loop (
+		[c (read-line fh)]
+		[k 0]
+)
+      (if (eof-object? c)
+          (close-input-port fh)
+          (begin
+	    (ci (coroutine (ping)))
+	    (print (co-value ci))
+	    (loop (read-line fh) (+ k 1) (co-move ci)))	   
+	  )
+      )))
+
+
 
 (define-iterator (pong)
   (let loop ()
-  
     (yield 'pong)
     (loop)))
-
-
 
 (define (ping-pong n)
   (let loop ((k 0) (ci (coroutine (ping))) (co (coroutine (pong))))
     (cond
-     ((= k n)
-      (print 'Finish))
-     ((< k n)
-      (print (co-value ci) " " (co-value co))
-      (loop (+ k 1) (co-move ci) (co-move co))))))
+      ((= k n)
+       (print 'Finish))
+      ((< k n)
+       (print (co-value ci) " " (co-value co))
+       (loop (+ k 1) (co-move ci) (co-move co))))))
 
 
+(define read-pgn-string(read-string #f (open-input-file "testdata/1.pgn")))
+;(define read-pgn-iterativ(read-it "testdata/1.pgn"))
+;(time read-pgn-iterativ)
+(time (extract-games read-pgn-string))
 
-;; (ping-pong 10)
+(define-iterator (evens)
+  (let loop ((i 0))
+    (loop (+ (yield i) 2))))
+
+(iterate (evens)
+	 (print "it = " it)
+	 (if (>= it 20)
+	     (break #f)
+	     it))
 
 
 (test-exit)

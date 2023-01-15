@@ -39,7 +39,7 @@
 		      (:! abnf:dquote)))
  
 (define tag (abnf:bind-consumed-strings->list
-	     tag-record
+	     'tag
 	     (abnf:concatenation
 	      begin-tag
 	      tagkey
@@ -97,41 +97,75 @@
 
 (define ply-text
   (abnf:alternatives
-   castling
-   (abnf:concatenation
-    (abnf:alternatives file piece)
-    (abnf:alternatives file capturechar piece rank)
-    (:*
-     (abnf:alternatives file piece capturechar rank annotation)))))
+    castling
+    (abnf:concatenation
+     (abnf:alternatives file piece)
+     (abnf:alternatives file capturechar piece rank)
+     (:* (abnf:alternatives file piece capturechar rank annotation)))))
    
 (define ply (between-fws ply-text ) )
 
-
-
 (define move
   (abnf:bind-consumed-strings->list
-   move-record
+   'move
    (abnf:concatenation
     movenumber
-    (abnf:bind-consumed->string ply )
+    (abnf:bind-consumed->string ply) 
     (:* (abnf:alternatives
 	 comment
-	 (abnf:bind-consumed->string ply )
+	 (abnf:bind-consumed->string ply) 
 	 (abnf:bind-consumed->string result))))))
 
-(define all-tags
-  (:*
-   (abnf:concatenation 
-    tag
-    newlines)))
+;used to find end of pgn
+(define moves-without-result
+  (abnf:bind-consumed-strings->list
+   (abnf:concatenation
+    movenumber
+    (abnf:bind-consumed->string ply) 
+    (:* (abnf:alternatives
+	 comment
+	 (abnf:bind-consumed->string ply) 
+	 )))))
 
-(define all-moves (:+ move))
+(define all-moves-with-result
+  (abnf:concatenation
+   (:+ moves-without-result)
+   (abnf:bind-consumed->string result)
+   ))
 
+
+  (define all-tags
+    (:*
+     (abnf:concatenation 
+      tag
+      newlines)))
+
+  (define all-moves 		   (:+ move))
 (define game
   (abnf:bind-consumed-strings->list
-   game-record
+   'game
    (abnf:concatenation
     all-tags
     all-moves)))
 
 (define pgn (:+ game))
+
+
+(define-iterator (ping)
+  (let loop ()
+    (yield 'ping)
+    (loop)))
+
+(define-iterator (pong)
+  (let loop ()
+    (yield 'pong)
+    (loop)))
+
+(define (ping-pong n)
+  (let loop ((k 0) (ci (coroutine (ping))) (co (coroutine (pong))))
+    (cond
+      ((= k n)
+       (print 'Finish))
+      ((< k n)
+       (print (co-value ci) " " (co-value co))
+       (loop (+ k 1) (co-move ci) (co-move co))))))

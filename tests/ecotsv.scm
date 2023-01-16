@@ -2,9 +2,12 @@
 	(prefix abnf abnf:)
 	(chicken io)
 	(chicken format)
-	utf8)
+        srfi-1
+	utf8
+        pgn
+        )
 
-(include "pgnparser-impl.scm")
+
 (define pcsv (make-parser #\tab))
 (define-values (fcell _ fcsv) (make-format #\tab))
 (define (err s)
@@ -22,7 +25,7 @@
 (define pgnparser
   (lambda (s)
     (if (equal? s "pgn") '()
-	(let* ([tokens (pgn car err `(() ,(->char-list s)))])
+	(let* ([tokens (all-moves car err `(() ,(->char-list s)))])
 	  (for-each
 	   (lambda (t)
 	     (display t))

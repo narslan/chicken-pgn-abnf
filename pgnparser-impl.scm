@@ -1,5 +1,5 @@
 (module pgn
-  (pgn)
+  *
   (import
     scheme (chicken base)
     (chicken io)

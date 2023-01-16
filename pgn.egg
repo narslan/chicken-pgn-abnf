@@ -3,4 +3,5 @@
 ((author "Nevroz Arslan")
  (synopsis "abnf parser for pgn")
  (license "GPLv3")
+ (category "games" "parser")
  (components (extension pgn (source "pgnparser-impl.scm"))))

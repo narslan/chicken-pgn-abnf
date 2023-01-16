@@ -31,21 +31,20 @@
    (abnf:concatenation (:+ abnf:alpha))))
 
 (define tagvalue
-  (abnf:concatenation (:! abnf:dquote)
-		      (abnf:bind-consumed->string
-		       (:* (abnf:alternatives
-			    ttext
-			    abnf:wsp)))
-		      (:! abnf:dquote)))
- 
-(define tag (abnf:bind-consumed-strings->list
-	     'tag
-	     (abnf:concatenation
-	      begin-tag
-	      tagkey
-	      (:! abnf:wsp)
-	      tagvalue
-	      end-tag)))
+  (abnf:concatenation
+   (:! abnf:dquote)
+   (abnf:bind-consumed->string (:* ttext))
+   (:! abnf:dquote)))
+
+(define tag
+  (abnf:bind-consumed-strings->list
+   'tag
+   (abnf:concatenation
+    begin-tag
+    tagkey
+    (:! abnf:wsp)
+    tagvalue
+    end-tag)))
 
 ;;Move
 
@@ -77,12 +76,14 @@
 
 (define comment-text
   (abnf:bind-consumed->string
-    (abnf:concatenation 
+    (abnf:concatenation
      (:! (abnf:char #\{) )
      (:*
       (abnf:concatenation
        (:? fws)
-       unicode-ctext))
+       unicode-ctext
+       (:? fws)
+       ))
      (:? fws)
      (:! (abnf:char #\})))))
 
@@ -102,7 +103,7 @@
      (abnf:alternatives file piece)
      (abnf:alternatives file capturechar piece rank)
      (:* (abnf:alternatives file piece capturechar rank annotation)))))
-   
+ 
 (define ply (between-fws ply-text ) )
 
 (define move
@@ -110,20 +111,23 @@
    'move
    (abnf:concatenation
     movenumber
-    (abnf:bind-consumed->string ply) 
+    
     (:* (abnf:alternatives
 	 comment
-	 (abnf:bind-consumed->string ply) 
+	 (abnf:bind-consumed->string ply)
 	 (abnf:bind-consumed->string result))))))
 
 
 (define all-tags
   (:*
-   (abnf:concatenation 
+   (abnf:concatenation
     tag
     newlines)))
 
-(define all-moves (:+ move))
+(define all-moves (abnf:concatenation
+                   (:? comment)
+                   (:+ move)
+                   ))
 
 (define game
   (abnf:bind-consumed-strings->list

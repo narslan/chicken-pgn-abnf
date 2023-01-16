@@ -3,7 +3,7 @@
   (chicken string)
   (chicken format)
   test
-  iterators
+
   )
 
 (include-relative "../pgnparser-impl.scm")
@@ -44,12 +44,23 @@
  ;; 	       ((equal? 'game-record (car t)) (
  ;; 					       print (yellow (car t))) )
 
+(test "COMMENT" '()
+      (begin
+        (define read-pgn-string(read-string #f (open-input-file "testdata/comment.pgn")))
+        (time (extract-games read-pgn-string))
+        '())
+
+ )
+
+(test "SIMPLE" '()
+      (begin
+        (define read-pgn-string(read-string #f (open-input-file "testdata/simple.pgn")))
+        (time (extract-games read-pgn-string))
+        '()))
 
 
-
-(define read-pgn-string(read-string #f (open-input-file "testdata/1.pgn")))
-;(define read-pgn-iterativ(read-it "testdata/1.pgn"))
+;;(define read-pgn-string(read-string #f (open-input-file "testdata/zahak_zatour.pgn"))) 
+;;(define read-pgn-iterativ(read-it "testdata/1.pgn"))
 ;(time read-pgn-iterativ)
-(time (extract-games read-pgn-string))
 
 (test-exit)

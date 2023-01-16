@@ -1,17 +1,17 @@
-;;abbreviatons for some regularly used procedures. 
+;;abbreviatons for some regularly used procedures.
 (define :? abnf:optional-sequence)
 (define :! abnf:drop-consumed)
 (define :* abnf:repetition)
 (define :+ abnf:repetition1)
 
-;;folding white space look for at least one space and any crlf 
+;;folding white space look for at least one space and any crlf
 
 (define fws
   (abnf:concatenation
    (:?
     (abnf:concatenation
      (:* abnf:wsp)
-     (:* 
+     (:*
       (abnf:alternatives abnf:crlf abnf:lf abnf:cr))))
    (:+ abnf:wsp)))
 
@@ -19,16 +19,16 @@
 
 (define (between-fws p)
   (abnf:concatenation
-   (:! (:* fws)) p 
+   (:! (:* fws)) p
    (:! (:* fws))))
 
 ;; matches any number of crlf
 
 (define newlines
   (abnf:drop-consumed
-   (:* 
+   (:*
     (abnf:set-from-string "\r\n"))) )
-  
+
 ;;TAG
 ;;this is a PGN tag => [TAGKEY "TAGVALUE"]
 ;; we define here matchers that makes up a tag
@@ -39,12 +39,10 @@
 ;; Matches any US-ASCII character except for nul \r \n
 (define text
   (abnf:set (char-set-difference
-             char-set:ascii 
-             (char-set (integer->char 0) 
-                       (integer->char 10) 
-                       (integer->char 13)
-		       
-		       ))))
+             char-set:ascii
+             (char-set (integer->char 0)
+                       (integer->char 10)
+                       (integer->char 13)))))
 
 ;; Unicode variant of text
 (define unicode-text
@@ -58,7 +56,7 @@
               char-set:full 
               char-set:ascii))))
 
-;; ttext matches any ascii character except "
+;; any ascii character except #\{ #\}
 (define ttext
   (abnf:set (char-set-difference char-set:ascii (char-set #\" ))))
 
@@ -67,13 +65,17 @@
   (abnf:set (char-set-union
 	     (char-set-difference
 	      char-set:ascii
-	      (char-set (integer->char 22) ))
+	      (char-set #\"))
 	     (char-set-difference
-              char-set:full 
+              char-set:full
               char-set:ascii))))
 
-;; unicode-ctext matches unicode characters for the comments.
-(define unicode-ctext
+;; any ascii character except #\{ #\}
+(define ctext
+  (abnf:set (char-set-difference char-set:ascii (char-set #\{ #\} ))))
+
+;; any unicode character except #\{ #\}
+(define unicode-ctext 
   (abnf:set
    (char-set-union
     (char-set-difference char-set:graphic (char-set #\{ #\} #\\))

@@ -12,75 +12,52 @@
 
 (let* ((tag-cases
         `(
-          ("[Event \"Havana    m.   \"]"  (tag-record ) ())
-          ("[Event \"Havana m.\"]\n" ((tagvalue "Havana m.") (tagkey "Event")) ())
-          ("[Event \"Havana m.\"]\r\n"  ((tagvalue "Havana m.") (tagkey "Event")) ())))    
+          ("[Event \"Havana    m.   \"]"  (("Event"  "Havana    m.   ")) ())
+          ("[Event \"Havana m.\"]\n" (("Event" "Havana m.") ) ())
+	  ("[Event \"Havana m.\"]\r\n" (("Event" "Havana m.") ) ())
 
-       (tag-multiline-cases
-        `(
-          ("[Event \"Havana m.\"]\r\n[EventTest \"Havana2\"]"  ("Havana2" "EventTest" "Havana m." "Event") ())))
-
-       (move-text-cases
-        `(
-          ("e4 "     ((movetext "e4"))    ())
-          ("Nf3 "    ((movetext "Nf3"))   ())
-          ("bxc3 "   ((movetext "bxc3"))  ())
-          ("axb6 \n"   ((movetext "axb6"))  ())
-          ("Qxb6 "   ((movetext "Qxb6"))  ())
-          ("axb6# "  ((movetext "axb6#")) ())
-          (" O-O "   ((movetext "O-O")) ())
-          (" O-O-O "   ((movetext "O-O-O")) ())
-	  (" O-O-O+ "   ((movetext "O-O-O+")) ())
-	  (" O-O-O+! "   ((movetext "O-O-O+!")) ())
-	  (" O-O-O+!! "   ((movetext "O-O-O+!!")) ())
 	  ))
-       ;;TODO: it fails when there is no whitespace around castling expression.
-     ;;  ("O-O-O+!"   ((movetext "O-O-O+!!")) ())
-       (single-move-cases
+       (ply-cases
         `(
-          ("1.e4 e5 "       ((move) (movetext "e5") ( movetext "e4"   ) (movenumber "1"))    ())
-          ("29. Ng6 Nf3 "   ((move) (movetext "Nf3") ( movetext "Ng6" ) (movenumber "29"))   ())
-          ("45. Nf3 Bc3 "   ((move) (movetext "Bc3") ( movetext "Nf3" ) (movenumber "45")))))
-    
-       (many-move-cases
+          ("e4 "     ("e4")    ())
+          ("Nf3 "    ("Nf3")   ())
+          ("bxc3 "   ("bxc3")  ())
+          ("axb6 "   ("axb6")  ())
+          ("Qxb6 "   ("Qxb6")  ())
+          ("axb6# "  ("axb6#") ())
+          (" O-O "   ("O-O") ())
+          (" O-O-O "   ( "O-O-O") ())
+	  (" O-O-O+ "   ("O-O-O+") ())
+	  (" O-O-O+!! "   ("O-O-O+!!") ())
+	  ))
+       
+       (move-cases
         `(
-          ("1. c4 Nf3 2. Bf3 Nf6 "    ((move) (movetext "Nf6") (movetext "Bf3") (movenumber "2") (move) (movetext "Nf3") (movetext "c4") (movenumber "1")  )    ())))
-    
-       (game-cases
+          ("1.e4 e5 "       (("e4"  "e5") )    ())
+          ("29. Ng6 Nf4 "   (("Ng6" "Nf4") )   ())
+	  ("29. O-O O-O-O "   (("O-O" "O-O-O") )   ())
+          ("45. Bc3 Qe8+ "   (("Bc3"  "Qe8+" ) ))))
+
+       (multiple-move-cases
         `(
-          ("[Event \"Istanbul\"]\n[WhiteELO \"2221\"]\n 1. "
-	   ( )    ()))))
+          ("1.e4 e5 2. Nf4 Kh3 * "       (("e4"  "e5") )    ())
+          ("1.e4 e5 2. Nf4 Kh4 3. h6 "   (("Ng6" "Nf4") )   ())
+          ))
 
+        (multiple-tag-cases
+        `(
+          ("[Event \"Havana m.\"]\n[White \"Jose Capablanca\"]\n"       (("e4"  "e5") )    ())
+         
+          ))
 
- 
-  
-  (test-group "move text cases" (for-each (lambda (p)
-					    (let ((inp (first p))
-						  (res (second p)))
-					      (let ((is (string->input-stream inp)))
-						(ply (lambda (s) (test (apply sprintf "~S -> ~S" p) res (car s))) err is))))
-					  move-text-cases))
-  
-  (test-group "single move cases" (for-each (lambda (p)
-					      (let ((inp (first p))
-						    (res (second p)))
-						(let ((is (string->input-stream inp)))
-						  (move (lambda (s) (test (apply sprintf "~S -> ~S" p) res (car s))) err is))))
-					    single-move-cases))
-
- (test-group "many moves cases" (for-each (lambda (p)
-					       (let ((inp (first p))
-						     (res (second p)))
-						 (let ((is (string->input-stream inp)))
-						   (all-moves (lambda (s) (test (apply sprintf "~S -> ~S" p) res (car s))) err is))))
-					     many-move-cases))
-   
- (test-group "a game"  (for-each (lambda (p)
-				 (let ((inp (first p))
-				       (res (second p)))
-				   (let ((is (string->input-stream inp)))
-				     (game (lambda (s) (test (apply sprintf "~S -> ~S" p) res (car s))) err is))))
-			       game-cases))
+	 (game-body-cases
+        `(
+          ("[Event \"Havana m.\"]\n[White \"Jose Capablanca\"]\n1.e4 e5 2.c3 O-O-O "       (("e4"  "e5") )    ())
+	  ("[Event \"Havana m.\"]\n[White \"Jose Capablanca\"]\n1.e4 e5 2.c3 O-O-O \n"       (("e4"  "e5") )    ())
+	  
+          ))
+       
+)
 
  (test-group "tags"  (for-each(lambda (p)
 				(let ((inp (first p))
@@ -89,7 +66,41 @@
 				    (tag (lambda (s) (test (apply sprintf "~S -> ~S" p) res (car s))) err is))))
 			      tag-cases))
 
+ (test-group "plies"  (for-each(lambda (p)
+				(let ((inp (first p))
+				      (res (second p)))
+				  (let ((is (string->input-stream inp)))
+				    (ply (lambda (s) (test (apply sprintf "~S -> ~S" p) res (car s))) err is))))
+			      ply-cases))
+
+ (test-group "moves"  (for-each(lambda (p)
+				(let ((inp (first p))
+				      (res (second p)))
+				  (let ((is (string->input-stream inp)))
+				    (move (lambda (s) (test (apply sprintf "~S -> ~S" p) res (car s))) err is))))
+			      move-cases))
+
+(test-group "multiple moves"  (for-each(lambda (p)
+				(let ((inp (first p))
+				      (res (second p)))
+				  (let ((is (string->input-stream inp)))
+				    (all-moves (lambda (s) (test (apply sprintf "~S -> ~S" p) res (car s))) err is))))
+			      multiple-move-cases))
+(test-group "multiple tags"  (for-each(lambda (p)
+				(let ((inp (first p))
+				      (res (second p)))
+				  (let ((is (string->input-stream inp)))
+				    (all-tags (lambda (s) (test (apply sprintf "~S -> ~S" p) res (car s))) err is))))
+			      multiple-tag-cases))
+(test-group "game body cases"  (for-each(lambda (p)
+				(let ((inp (first p))
+				      (res (second p)))
+				  (let ((is (string->input-stream inp)))
+				    (pgn (lambda (s) (test (apply sprintf "~S -> ~S" p) res (car s))) err is))))
+			      game-body-cases))
+
  )
+
 
 
 (test-exit)

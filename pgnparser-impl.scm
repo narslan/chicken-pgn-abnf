@@ -127,8 +127,7 @@
                    (:*
                     (abnf:alternatives
                      comment
-                     move
-                     ))))
+                     move))))
 
 (define game
   (abnf:bind-consumed-strings->list

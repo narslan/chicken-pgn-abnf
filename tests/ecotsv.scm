@@ -2,16 +2,11 @@
 	(prefix abnf abnf:)
 	(chicken io)
 	(chicken format)
-	srfi-1
-	utf8
-	trace
-	)
+	utf8)
 
 (include "pgnparser-impl.scm")
 (define pcsv (make-parser #\tab))
 (define-values (fcell _ fcsv) (make-format #\tab))
-
-
 (define (err s)
   (print "pgn message error on stream: " s)
   (list)) ;
@@ -41,28 +36,20 @@
 	   (lambda (t)
 	     (display t))
 	   tokens)
-	  (newline)
-	  ))))
+	  (newline)))))
 
 (define record-analyze
   (lambda (record)
-  
     (let* ([openingName  (second record)]
 	   [pgnSource  (third record)]
 	   [uciSource  (fourth record)]
 	   [fenSource  (fifth record)]
 	   )
       (begin
-	(pgnparser pgnSource)
-     ))    ))
+	(pgnparser pgnSource)))))
 
 (let ((res (pcsv (->char-list file-to-string))))
   (for-each 
    record-analyze
    (map csv-record->list res)))
   
-
-
-
-  
-

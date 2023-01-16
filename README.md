@@ -2,11 +2,11 @@
 `chicken-pgn` is a PGN parser for chicken scheme. 
 It parses chess games in pgn format. 
 
+It uses [chicken-abnf](https://github.com/iraikov/chicken-abnf) 
+        [chicken-lexgen](https://github.com/iraikov/chicken-lexgen). 
+They are awesome!
 
-It uses (chicken-abnf)[https://github.com/iraikov/chicken-abnf] 
-and (chicken-lexgen)[https://github.com/iraikov/chicken-lexgen]. They are awesome!
-
-**Caveat: It ignores the comments.**
+**Caveat: The parser ignores the comments.**
 
 ### INSTALLATION
 Clone this repository, under the project folder.

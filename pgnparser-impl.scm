@@ -75,13 +75,13 @@
 (define result (between-fws result-variations ))
 
 (define comment-text
-  (abnf:bind-consumed->string
+  (:!
     (abnf:concatenation
      (:! (abnf:char #\{) )
      (:*
       (abnf:concatenation
        (:? fws)
-       unicode-ctext
+       ctext
        (:? fws)
        ))
      (:? fws)
@@ -111,7 +111,6 @@
    'move
    (abnf:concatenation
     movenumber
-    
     (:* (abnf:alternatives
 	 comment
 	 (abnf:bind-consumed->string ply)
@@ -125,9 +124,11 @@
     newlines)))
 
 (define all-moves (abnf:concatenation
-                   (:? comment)
-                   (:+ move)
-                   ))
+                   (:*
+                    (abnf:alternatives
+                     comment
+                     move
+                     ))))
 
 (define game
   (abnf:bind-consumed-strings->list

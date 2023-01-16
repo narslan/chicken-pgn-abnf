@@ -54,14 +54,12 @@
 	   )
       (begin
 	(pgnparser pgnSource)
-	) )
-    ))
+     ))    ))
 
 (let ((res (pcsv (->char-list file-to-string))))
   (for-each 
    record-analyze
-   (map csv-record->list res)
-   ))
+   (map csv-record->list res)))
   
 
 

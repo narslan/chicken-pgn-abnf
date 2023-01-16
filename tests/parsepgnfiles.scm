@@ -2,8 +2,6 @@
   test
   (chicken string)
   (chicken format)
-  test
-
   )
 
 (include-relative "../pgnparser-impl.scm")
@@ -27,15 +25,14 @@
 (define (err-plain s)
   'error)
 
-
-					;parser returns a list of games a list of tags
+;return a list of games a list of tags
 (define (extract-games s)
   (let* (
 	 [tokens (reverse (pgn car err `(() ,(string->input-stream s))))]
 	 [counter 0])
     (for-each
      (lambda (t)
-       (cond ((equal? 'move (car t)) (display (green (cdr t))) )
+       (cond ((equal? 'move (car t)) (print (green (cdr t))) )
 	     ((equal? 'tag (car t)) (print (blue (cdr t))) )
 	     (else (print t)))
        )
@@ -44,13 +41,11 @@
  ;; 	       ((equal? 'game-record (car t)) (
  ;; 					       print (yellow (car t))) )
 
-(test "COMMENT" '()
+(test "WITH COMMENT" '()
       (begin
-        (define read-pgn-string(read-string #f (open-input-file "testdata/comment.pgn")))
+        (define read-pgn-string(read-string #f (open-input-file "testdata/zahak_zatour.pgn")))
         (time (extract-games read-pgn-string))
-        '())
-
- )
+        '()))
 
 (test "SIMPLE" '()
       (begin

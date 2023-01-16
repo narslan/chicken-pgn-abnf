@@ -1,37 +1,39 @@
-(module pgn
-  *
+(module pgn-abnf
+    (
+     pgn-db
+     pgn-game
+     )
   (import
     scheme (chicken base)
     (chicken io)
     (prefix abnf abnf:) 
     (prefix abnf-consumers abnf:)
-    (only lexgen lex)
-  test
-  (only utf8-srfi-14 char-set char-set-difference char-set-union
-	char-set:graphic char-set:printing char-set:ascii char-set:full))
-
-(include-relative "matchers.scm")
-
-(define tagkey
-  (abnf:bind-consumed->string
-   (abnf:concatenation (:+ abnf:alpha))))
-
-(define tagvalue
-  (abnf:concatenation
-   (:! abnf:dquote)
-   (abnf:bind-consumed->string (:* ttext))
-   (:! abnf:dquote)))
-
-(define tag
-  (abnf:bind-consumed-strings->list
-   'tag
-   (abnf:concatenation
-    begin-tag
-    tagkey
-    (:! abnf:wsp)
-    tagvalue
-    end-tag)))
-
+    test
+    (only utf8-srfi-14 char-set char-set-difference char-set-union
+	  char-set:graphic char-set:printing char-set:ascii char-set:full))
+  
+  (include-relative "matchers.scm")
+  
+  (define tagkey
+    (abnf:bind-consumed->string
+     (abnf:concatenation (:+ abnf:alpha))))
+  
+  (define tagvalue
+    (abnf:concatenation
+     (:! abnf:dquote)
+     (abnf:bind-consumed->string (:* ttext))
+     (:! abnf:dquote)))
+  
+  (define tag
+    (abnf:bind-consumed-strings->list
+     'tag
+     (abnf:concatenation
+      begin-tag
+      tagkey
+      (:! abnf:wsp)
+      tagvalue
+      end-tag)))
+  
 ;;Move
 
 (define piece  (abnf:set-from-string "KNRBQknrbq" ))
@@ -62,16 +64,15 @@
 
 (define comment-text
   (:!
-    (abnf:concatenation
-     (:! (abnf:char #\{) )
-     (:*
-      (abnf:concatenation
-       (:? fws)
-       ctext
-       (:? fws)
-       ))
-     (:? fws)
-     (:! (abnf:char #\})))))
+   (abnf:concatenation
+    (:! (abnf:char #\{) )
+    (:*
+     (abnf:concatenation
+      (:? fws)
+      ctext
+      (:? fws)))
+    (:? fws)
+    (:! (abnf:char #\})))))
 
 (define comment (between-fws comment-text ))
 
@@ -84,12 +85,12 @@
 
 (define ply-text
   (abnf:alternatives
-    castling
+   castling
     (abnf:concatenation
      (abnf:alternatives file piece)
      (abnf:alternatives file capturechar piece rank)
      (:* (abnf:alternatives file piece capturechar rank annotation)))))
- 
+
 (define ply (between-fws ply-text ) )
 
 (define move
@@ -102,7 +103,6 @@
 	 (abnf:bind-consumed->string ply)
 	 (abnf:bind-consumed->string result))))))
 
-
 (define all-tags
   (:*
    (abnf:concatenation
@@ -114,16 +114,14 @@
                     (abnf:alternatives
                      comment
                      move))))
-
-(define game
+(define pgn-game
   (abnf:bind-consumed-strings->list
    'game
    (abnf:concatenation
     all-tags
     all-moves)))
 
-(define pgn (:+ game))
-
+(define pgn-db (:+ pgn-game))
 )
 
 

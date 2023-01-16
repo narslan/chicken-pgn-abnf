@@ -2,3 +2,5 @@
 *.so
 *.o
 !tests/century-game.pgn
+*.link
+*.sh

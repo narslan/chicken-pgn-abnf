@@ -16,6 +16,7 @@ This library contains procedures for parsing PGN database files as described
 TODO:
 - a file splitter utility function that split big pgn files efficently. 
 - using define-record-type to construct record types out of moves and tags 
+- add an http client to retrieve pgn files from remote.
 ###  Sample Usage
 
 ```

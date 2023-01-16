@@ -24,8 +24,8 @@
 ;;setup pgn parser
 (define pgnparser
   (lambda (s)
-    (if (equal? s "pgn") '()
-	(let* ([tokens (all-moves car err `(() ,(->char-list s)))])
+    (if (equal? s "pgn") '() ;;ignore header line
+	(let* ([tokens (pgn-move-list car err `(() ,(->char-list s)))])
 	  (for-each
 	   (lambda (t)
 	     (display t))
@@ -37,8 +37,7 @@
     (let* ([openingName  (second record)]
 	   [pgnSource  (third record)]
 	   [uciSource  (fourth record)]
-	   [fenSource  (fifth record)]
-	   )
+	   [fenSource  (fifth record)])
       (begin
 	(pgnparser pgnSource)))))
 

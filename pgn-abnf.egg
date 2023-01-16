@@ -2,7 +2,7 @@
 
 ((author "Nevroz Arslan")
  (dependencies abnf utf8)
- (test-dependencies test)
+ (test-dependencies test csv-abnf)
  (license "GPL-3")
  (category parsing)
  (components (extension pgn-abnf (source "pgnparser-impl.scm")))

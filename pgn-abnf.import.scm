@@ -6,7 +6,12 @@
       'pgn-abnf
       'pgn-abnf
       (scheme#list)
-      '((pgn-db . pgn-abnf#pgn-db) (pgn-game . pgn-abnf#pgn-game))
+      '((pgn-db . pgn-abnf#pgn-db)
+        (pgn-game . pgn-abnf#pgn-game)
+        (pgn-tag . pgn-abnf#pgn-tag)
+        (pgn-move . pgn-abnf#pgn-move)
+        (pgn-tag-list . pgn-abnf#pgn-tag-list)
+        (pgn-move-list . pgn-abnf#pgn-move-list))
       (scheme#list)
       (scheme#list))))
 

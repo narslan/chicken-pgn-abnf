@@ -1,8 +1,9 @@
 (import 
   test
   srfi-1
-  pgn
-  (chicken format))
+  (chicken format)
+  pgn-abnf
+  )
 
 (define (string->input-stream s) `(() ,(string->list s)))
 (define (err s)
@@ -30,7 +31,7 @@
 				(let ((inp (first p))
 				      (res (second p)))
 				  (let ((is (string->input-stream inp)))
-				    (tag (lambda (s) (test (apply sprintf "~S -> ~S" p) res (car s))) err is))))
+				    (pgn-tag (lambda (s) (test (apply sprintf "~S -> ~S" p) res (car s))) err is))))
 			      tag-cases))
 
 
@@ -38,7 +39,7 @@
 				(let ((inp (first p))
 				      (res (second p)))
 				  (let ((is (string->input-stream inp)))
-				    (move (lambda (s) (test (apply sprintf "~S -> ~S" p) res (car s))) err is))))
+				    (pgn-move (lambda (s) (test (apply sprintf "~S -> ~S" p) res (car s))) err is))))
 			      move-cases))
  )
 

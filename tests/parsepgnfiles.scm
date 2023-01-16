@@ -1,7 +1,7 @@
 (import 
   (chicken string)
   (chicken io)
-  pgn
+  pgn-abnf
   )
 
 (define (string->input-stream s) (string->list s) )
@@ -13,7 +13,7 @@
 ;return a list of games a list of tags
 (define (extract-games s)
   (let* (
-	 [tokens (reverse (pgn car err `(() ,(string->input-stream s))))]
+	 [tokens (reverse (pgn-db car err `(() ,(string->input-stream s))))]
 	 [counter 0])
     (for-each
      (lambda (t)

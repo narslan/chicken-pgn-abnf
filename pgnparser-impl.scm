@@ -1,30 +1,16 @@
-(import 
-	(chicken io)
-	(prefix abnf abnf:) 
-	(prefix abnf-consumers abnf:)
-	(only lexgen lex)
-	test
-	(only utf8-srfi-14 char-set char-set-difference char-set-union
-	      char-set:graphic char-set:printing char-set:ascii char-set:full))
+(module pgn
+  (pgn)
+  (import
+    scheme (chicken base)
+    (chicken io)
+    (prefix abnf abnf:) 
+    (prefix abnf-consumers abnf:)
+    (only lexgen lex)
+  test
+  (only utf8-srfi-14 char-set char-set-difference char-set-union
+	char-set:graphic char-set:printing char-set:ascii char-set:full))
 
 (include-relative "matchers.scm")
-
-(define-record-type move-record
-  (list->move-record elems)
-  move-record?
-  (elems move-record->list))
-
-(define-record-type tag-record
-  (list->tag-record elems)
-  tag-record?
-  (elems tag-record->list))
-
-(define-record-type game-record
-  (list->game-record elems)
-  game-record?
-  (elems game-record->list))
-
-;Tag
 
 (define tagkey
   (abnf:bind-consumed->string
@@ -137,5 +123,7 @@
     all-moves)))
 
 (define pgn (:+ game))
+
+)
 
 

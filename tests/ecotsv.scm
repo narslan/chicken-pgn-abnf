@@ -14,15 +14,6 @@
 (define (->char-list s)
   (if (string? s) (string->list s) s))
 
-;;color definitions for output
-(define (red x) (string-append "\x1B[31m" (->string x) "\x1B[0m"))
-(define (green x) (string-append "\x1B[32m" (->string x) "\x1B[0m"))
-(define (yellow x) (string-append "\x1B[33m" (->string x) "\x1B[0m"))
-(define (blue x) (string-append "\x1B[34m" (->string x) "\x1B[0m"))
-(define (magenta x) (string-append "\x1B[35m" (->string x) "\x1B[0m"))
-(define (cyan x) (string-append "\x1B[36m" (->string x) "\x1B[0m"))
-(define (bold x) (string-append "\x1B[1m" (->string x) "\x1B[0m"))
-(define (underline x) (string-append "\x1B[4m" (->string x) "\x1B[0m"))
 
 ;;input source
 (define file-to-string(read-string #f (open-input-file "eco_lichess.tsv")))

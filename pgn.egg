@@ -1,0 +1,6 @@
+;;;; pgn.egg
+
+((author "Nevroz Arslan")
+ (synopsis "abnf parser for pgn")
+ (license "GPLv3")
+ (components (extension pgn (source "pgnparser-impl.scm"))))

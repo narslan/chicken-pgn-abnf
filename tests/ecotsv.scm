@@ -1,10 +1,9 @@
 (import csv-abnf
 	(prefix abnf abnf:)
-	(chicken io)
 	(chicken format)
         srfi-1
 	utf8
-        pgn
+        pgn-abnf
         )
 
 

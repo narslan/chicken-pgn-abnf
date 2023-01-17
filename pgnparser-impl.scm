@@ -5,6 +5,7 @@
      pgn-move
      pgn-tag-list
      pgn-move-list
+     all-moves-with-result
      )
   (import
     scheme (chicken base)
@@ -16,7 +17,7 @@
 	  char-set:graphic char-set:printing char-set:ascii char-set:full))
   
   (include-relative "matchers.scm")
-  
+
   (define tagkey
     (abnf:bind-consumed->string
      (abnf:concatenation (:+ abnf:alpha))))
@@ -85,7 +86,7 @@
       (:+ abnf:decimal)
       dotchar
       lwsp)))
-  
+ 
 (define ply-text
   (abnf:alternatives
    castling
@@ -96,6 +97,8 @@
 
 (define ply (between-fws ply-text ) )
 
+(include-relative "matcher-splitter.scm")  
+
 (define pgn-move
   (abnf:bind-consumed-strings->list
    'move
@@ -105,6 +108,25 @@
 	 comment
 	 (abnf:bind-consumed->string ply)
 	 (abnf:bind-consumed->string result))))))
+
+
+(define moves-without-result
+  (abnf:bind-consumed-strings->list
+   (abnf:concatenation
+    move-number
+    (abnf:bind-consumed->string ply) 
+    (:* (abnf:alternatives
+	 comment
+	 (abnf:bind-consumed->string ply) 
+	 )))))
+;;matches a standalone line with result at the end.yes
+(define all-moves-with-result
+  (abnf:concatenation
+   (:+ moves-without-result)
+   (abnf:bind-consumed->string result)
+   ))
+
+
 
 (define pgn-tag-list
   (:*

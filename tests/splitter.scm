@@ -7,6 +7,7 @@
   test
   ;;iterators
   pgn-abnf
+  trace
   )
 
 
@@ -45,7 +46,8 @@
 
 
 
-;;(time (read-it "testdata/1.pgn"))
-(time (read-it "testdata/Adams.pgn"))
+;;(trace read-it)
+ (time (read-it "testdata/Adams.pgn"))
+;;(time (read-it "testdata/Adams.pgn"))
 
 (test-exit)

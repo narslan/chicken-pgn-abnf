@@ -1,3 +1,4 @@
+
 `pgn-abnf`
 PGN (Portable Game Notation) parser for Chicken Scheme. 
 
@@ -25,10 +26,10 @@ TODOs:
     - [] couchdb
     - [] lmdb
   - [] publish via websocket
-- [] using define-record-type to construct record types out of moves and tags as in `csv-abnf-parser`. 
-- [] Publishing the egg for indexing in Chicken egg index.
-
+- [] define-record-type to construct record types from moves and tags as in `csv-abnf-parser`. 
+- [] Publishing the egg for indexing.
 
 ```
 
-`pgn-abnf` uses the `chicken-abnf` pattern matcher library  to construct the parser. This library is deeply grateful to [chicken-abnf](https://github.com/iraikov/chicken-abnf) . 
+`pgn-abnf` uses the `chicken-abnf` pattern matcher library  to construct the parser. 
+I'm mostly thankful to [chicken-abnf](https://github.com/iraikov/chicken-abnf) . 

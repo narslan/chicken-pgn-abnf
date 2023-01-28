@@ -2,7 +2,9 @@
   (chicken string)
   (chicken io)
   (chicken process-context)
-   pgn-abnf)
+   pgn-abnf
+   trace
+   )
   
 
 (define (string->input-stream s) (string->list s))
@@ -24,5 +26,5 @@
        
      tokens)))
 (define read-pgn-string(read-string #f (open-input-file (car (command-line-arguments)))))
-(time (extract-games read-pgn-string))
-
+;(trace extract-games )
+(extract-games read-pgn-string)

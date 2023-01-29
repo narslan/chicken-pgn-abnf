@@ -1,6 +1,6 @@
 (import 
   test
-  srfi-1
+  (only srfi-1 first second)
   (chicken format)
   pgn-abnf
   )
@@ -15,16 +15,13 @@
           ("[Event \"Havana    m.   \"]"  (( tag "Event"  "Havana    m.   ")) ())
           ("[Event \"Havana m.\"]\n" ((tag "Event" "Havana m.") ) ())
 	  ("[Event \"Havana m.\"]\r\n" ((tag "Event" "Havana m.") ) ())
-
 	  ))
-       
        (move-cases
         `(
           ("1.e4 e5 "       ((move "e4"  "e5") )    ())
           ("29. Ng6 Nf4 "   ((move "Ng6" "Nf4") )   ())
 	  ("29. O-O O-O-O "   ((move "O-O" "O-O-O") )   ())
           ("45. Bc3 Qe8+ "   ((move "Bc3"  "Qe8+" ) ))))
-       
 )
 
  (test-group "tags"  (for-each(lambda (p)

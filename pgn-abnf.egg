@@ -1,10 +1,12 @@
-;;;; pgn.egg
+;;;; pgn-abnf.egg
 
 ((author "Nevroz Arslan")
- (dependencies abnf utf8)
+ (dependencies abnf)
  (test-dependencies test csv-abnf)
  (license "GPL-3")
  (category parsing)
- (components (extension pgn-abnf (source "pgnparser-impl.scm")))
+ (components (extension pgn-abnf
+ (csc-options "-sJ")
+))
  (synopsis "Parser procedures for Portable Game Notation (PGN)." )
  )

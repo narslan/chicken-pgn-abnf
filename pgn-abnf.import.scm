@@ -12,7 +12,7 @@
         (pgn-move . pgn-abnf#pgn-move)
         (pgn-tag-list . pgn-abnf#pgn-tag-list)
         (pgn-move-list . pgn-abnf#pgn-move-list)
-        (all-moves-with-result . pgn-abnf#all-moves-with-result))
+        (pgn-all-moves-with-result . pgn-abnf#pgn-all-moves-with-result))
       (scheme#list)
       (scheme#list))))
 

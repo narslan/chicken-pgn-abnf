@@ -1,8 +1,9 @@
 
-`pgn-abnf`
+
+### WIP: `pgn-abnf` 
 PGN (Portable Game Notation) parser for Chicken Scheme. 
 
-## Description
+###  Description
 This library contains procedures for parsing PGN database files as described
 [Standard: Portable Game Notation Specification](http://www.saremba.de/chessgml/standards/pgn/pgn-complete.htm)   
 
